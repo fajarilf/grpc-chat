@@ -1,7 +1,10 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
+import { roomRoutes } from './routes/room-routes';
 
 const router = Router();
+
+router.use('/rooms', roomRoutes);
 
 router.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', uptime: process.uptime() });
