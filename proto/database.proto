@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+package database;
+
+option go_package = "github.com/fajarilf/grpc-chat/proto"
