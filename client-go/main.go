@@ -3,81 +3,66 @@ package main
 import (
 	"bufio"
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
-	pb "github.com/fajarilf/grpc-chat-client/proto"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"github.com/coder/websocket"
 )
 
 func main() {
-	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	url := flag.String("url", "ws://localhost:3000/ws", "WebSocket server URL")
+	flag.Parse()
+
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer cancel()
+
+	dialCtx, dialCancel := context.WithTimeout(ctx, 10*time.Second)
+	defer dialCancel()
+
+	conn, _, err := websocket.Dial(dialCtx, *url, nil)
 	if err != nil {
-		log.Fatalf("Failed to connect: %v", err)
+		log.Fatalf("dial %s: %v", *url, err)
 	}
-	defer conn.Close()
+	defer conn.CloseNow()
 
-	client := pb.NewChatServiceClient(conn)
-	reader := bufio.NewReader(os.Stdin)
+	log.Printf("connected to %s", *url)
 
-	fmt.Println("Enter your username: ")
-	username, _ := reader.ReadString('\n')
-	username = strings.TrimSpace(username)
+	go readLoop(ctx, conn)
 
-	fmt.Println("Enter room name: ")
-	room, _ := reader.ReadString('\n')
-	room = strings.TrimSpace(room)
-
-	stream, err := client.JoinChat(context.Background(), &pb.JoinRequest{
-		Username: username,
-		Room:     room,
-	})
-	if err != nil {
-		log.Fatalf("Failed to join chat: %v", err)
-	}
-
-	go func() {
-		for {
-			msg, err := stream.Recv()
-			if err != nil {
-				log.Printf("Error receiving message: %v", err)
-				return
-			}
-
-			timestamp := time.Unix(msg.Timestamp, 0).Format("15:04:05")
-			fmt.Printf("\r\033[2K[%s] %s: %s\n>> ", timestamp, msg.Username, msg.Content)
-		}
-	}()
-
-	fmt.Println("Connected! Type your message (or /quit to exit): ")
-	fmt.Print(">> ")
-	for {
-		text, _ := reader.ReadString('\n')
-		text = strings.TrimSpace(text)
-
-		if text == "/quit" {
-			fmt.Println("Goodbye!")
-			return
-		}
-
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Println("type a message and press Enter (Ctrl+C to quit):")
+	for scanner.Scan() {
+		text := strings.TrimRight(scanner.Text(), "\r\n")
 		if text == "" {
 			continue
 		}
-
-		fmt.Print("\033[1A\033[2K")
-
-		_, err := client.SendMessage(context.Background(), &pb.Message{
-			Username: username,
-			Content:  text,
-			Room:     room,
-		})
-		if err != nil {
-			log.Printf("Failed to send message: %v", err)
-			fmt.Print("> ")
+		if err := conn.Write(ctx, websocket.MessageText, []byte(text)); err != nil {
+			log.Printf("write: %v", err)
+			break
 		}
+	}
+	if err := scanner.Err(); err != nil {
+		log.Printf("stdin: %v", err)
+	}
+
+	conn.Close(websocket.StatusNormalClosure, "bye")
+}
+
+func readLoop(ctx context.Context, conn *websocket.Conn) {
+	for {
+		_, data, err := conn.Read(ctx)
+		if err != nil {
+			if ctx.Err() == nil {
+				log.Printf("read: %v", err)
+			}
+			return
+		}
+		fmt.Printf("<- %s\n", data)
 	}
 }
