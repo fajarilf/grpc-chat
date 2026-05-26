@@ -21,7 +21,6 @@
   })
 
   function pageTitleFor(path: string): string {
-    if (path.startsWith("/monitoring")) return "Monitoring";
     return "Main"
   }
 </script>

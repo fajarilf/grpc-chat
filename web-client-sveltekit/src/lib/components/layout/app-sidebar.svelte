@@ -12,9 +12,9 @@
 
   const navItems = [
     { label: 'Main', href: '/', icon: LayoutDashboard },
-    { label: "Machine Monitoring", href: "/monitoring", icon: Monitor },
-    { label: "History", href: "/history", icon: History },
-    { label: "User Management", href: "/user-management", icon: Users },
+    // { label: "Machine Monitoring", href: "/monitoring", icon: Monitor },
+    // { label: "History", href: "/history", icon: History },
+    // { label: "User Management", href: "/user-management", icon: Users },
   ]
 
   const state = useSidebar();
@@ -24,7 +24,7 @@
 <Sidebar collapsible="icon">
     <SidebarHeader>
         <div class="flex items-center gap-2 px-2 py-1.5">
-            <div class="flex size-8 shrink-0 items-center justify-center rounded-md bg-ink text-warm-white">
+            <div class="flex size-8 shrink-0 items-center justify-center rounded-md text-warm-white bg-blue-600">
                 <MessageCircleCode class="size-4"/>
             </div>
             {#if state.open}
