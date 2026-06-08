@@ -4,6 +4,7 @@ import (
 	"log"
 	"net"
 
+	roompb "github.com/fajarilf/grpc-chat-proto/proto"
 	pb "github.com/fajarilf/grpc-chat-server/proto"
 	"google.golang.org/grpc"
 )
@@ -15,8 +16,12 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer()
+
 	chatServer := NewChatServer()
 	pb.RegisterChatServiceServer(grpcServer, chatServer)
+
+	roomServer := NewRoomServer()
+	roompb.RegisterRoomServiceServer(grpcServer, roomServer)
 
 	log.Println("Chat server started on :50051")
 

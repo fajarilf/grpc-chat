@@ -3,9 +3,12 @@ module github.com/fajarilf/grpc-chat-server
 go 1.25.0
 
 require (
-	google.golang.org/grpc v1.81.0
+	github.com/fajarilf/grpc-chat-proto v0.0.0
+	google.golang.org/grpc v1.81.1
 	google.golang.org/protobuf v1.36.11
 )
+
+replace github.com/fajarilf/grpc-chat-proto => ../proto-go
 
 require (
 	golang.org/x/net v0.51.0 // indirect
