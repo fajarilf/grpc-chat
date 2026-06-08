@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+import "type.proto";
+
+package user;
+
+option go_package = "github.com/fajarilf/grpc-chat/proto-go";
+
+message UserCreateRequest {
+    string name = 1;
+    string username = 2;
+    string password = 3;
+}
+
+message UserLoginRequest {
+    string username = 1;
+    string password = 2;
+}
+
+message UserResponse {
+    int32 id = 1;
+    string name = 2;
+    string username = 3;
+    repeated type.Room rooms = 4;
+}

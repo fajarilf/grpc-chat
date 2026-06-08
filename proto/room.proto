@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+import "user.proto";
+
+package room;
+
+option go_package = "github.com/fajarilf/grpc-chat/proto-go";
+
+enum BgTypes {
+    COLOR = 0;
+    IMAGE = 1;
+}
+
+message RoomCreateRequest {
+    string name = 1;
+    string description = 2;
+    string background = 3;
+    BgTypes background_type = 4;
+    repeated string users_ids = 5;
+}
+
+message RoomResponse {
+    string name = 1;
+    string description = 2;
+    string background = 3;
+    string background_type = 4;
+    repeated user.UserResponse users = 5;
+}

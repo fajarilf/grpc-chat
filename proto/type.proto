@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package type;
+
+option go_package = "github.com/fajarilf/grpc-chat/proto-go";
+
+message User {
+    int32 id = 1;
+    string name = 2;
+    string username = 3;
+    string password = 4;
+}
+
+message Room {
+    int32 id = 1;
+    string name = 2;
+    string description = 3;
+    string background = 4;
+    string background_type = 5;
+}
