@@ -1,0 +1,12 @@
+openapi: 3.0.0
+info:
+  title: "gRPC API Docs"
+  version: "1.0.0"
+servers:
+  - url: "/api"
+tags:
+  - name: Rooms
+    description: Room listing and creation
+paths:
+  /rooms:
+    $ref: "./room-docs.yaml"
