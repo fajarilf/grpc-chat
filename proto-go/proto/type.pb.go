@@ -27,6 +27,7 @@ type User struct {
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Username      string                 `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`
 	Password      string                 `protobuf:"bytes,4,opt,name=password,proto3" json:"password,omitempty"`
+	Token         string                 `protobuf:"bytes,5,opt,name=token,proto3" json:"token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -85,6 +86,13 @@ func (x *User) GetUsername() string {
 func (x *User) GetPassword() string {
 	if x != nil {
 		return x.Password
+	}
+	return ""
+}
+
+func (x *User) GetToken() string {
+	if x != nil {
+		return x.Token
 	}
 	return ""
 }
@@ -170,12 +178,13 @@ var File_type_proto protoreflect.FileDescriptor
 const file_type_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"type.proto\x12\x04type\"b\n" +
+	"type.proto\x12\x04type\"x\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
 	"\busername\x18\x03 \x01(\tR\busername\x12\x1a\n" +
-	"\bpassword\x18\x04 \x01(\tR\bpassword\"\x95\x01\n" +
+	"\bpassword\x18\x04 \x01(\tR\bpassword\x12\x14\n" +
+	"\x05token\x18\x05 \x01(\tR\x05token\"\x95\x01\n" +
 	"\x04Room\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
