@@ -31,7 +31,7 @@ case "$(uname -s)" in
     TS_PROTO_PATH="${TS_PROTO_PATH//\//\\}.cmd"
     ;;
 esac
-OUT_PATH="api-gateway/proto"
+OUT_PATH="api-gateway/src/proto"
 
 echo -e "${GREEN}Generating TypeScript code (ts-proto)...${NC}"
 mkdir -p "${OUT_PATH}"
