@@ -6,6 +6,18 @@
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import {
+  type CallOptions,
+  type ChannelCredentials,
+  Client,
+  type ClientOptions,
+  type ClientUnaryCall,
+  type handleUnaryCall,
+  makeGenericClientConstructor,
+  type Metadata,
+  type ServiceError,
+  type UntypedServiceImplementation,
+} from "@grpc/grpc-js";
 import { Room } from "./type";
 
 export const protobufPackage = "user";
@@ -19,6 +31,11 @@ export interface UserCreateRequest {
 export interface UserLoginRequest {
   username: string;
   password: string;
+}
+
+export interface UserLoginResponse {
+  username: string;
+  token: string;
 }
 
 export interface UserResponse {
@@ -196,6 +213,82 @@ export const UserLoginRequest: MessageFns<UserLoginRequest> = {
   },
 };
 
+function createBaseUserLoginResponse(): UserLoginResponse {
+  return { username: "", token: "" };
+}
+
+export const UserLoginResponse: MessageFns<UserLoginResponse> = {
+  encode(message: UserLoginResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.username !== "") {
+      writer.uint32(10).string(message.username);
+    }
+    if (message.token !== "") {
+      writer.uint32(18).string(message.token);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UserLoginResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUserLoginResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.username = reader.string();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.token = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UserLoginResponse {
+    return {
+      username: isSet(object.username) ? globalThis.String(object.username) : "",
+      token: isSet(object.token) ? globalThis.String(object.token) : "",
+    };
+  },
+
+  toJSON(message: UserLoginResponse): unknown {
+    const obj: any = {};
+    if (message.username !== "") {
+      obj.username = message.username;
+    }
+    if (message.token !== "") {
+      obj.token = message.token;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UserLoginResponse>): UserLoginResponse {
+    return UserLoginResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UserLoginResponse>): UserLoginResponse {
+    const message = createBaseUserLoginResponse();
+    message.username = object.username ?? "";
+    message.token = object.token ?? "";
+    return message;
+  },
+};
+
 function createBaseUserResponse(): UserResponse {
   return { id: 0, name: "", username: "", rooms: [] };
 }
@@ -302,6 +395,72 @@ export const UserResponse: MessageFns<UserResponse> = {
     message.rooms = object.rooms?.map((e) => Room.fromPartial(e)) || [];
     return message;
   },
+};
+
+export type UserServiceService = typeof UserServiceService;
+export const UserServiceService = {
+  register: {
+    path: "/user.UserService/Register" as const,
+    requestStream: false as const,
+    responseStream: false as const,
+    requestSerialize: (value: UserCreateRequest): Buffer => Buffer.from(UserCreateRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): UserCreateRequest => UserCreateRequest.decode(value),
+    responseSerialize: (value: UserResponse): Buffer => Buffer.from(UserResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): UserResponse => UserResponse.decode(value),
+  },
+  login: {
+    path: "/user.UserService/Login" as const,
+    requestStream: false as const,
+    responseStream: false as const,
+    requestSerialize: (value: UserLoginRequest): Buffer => Buffer.from(UserLoginRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): UserLoginRequest => UserLoginRequest.decode(value),
+    responseSerialize: (value: UserLoginResponse): Buffer => Buffer.from(UserLoginResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): UserLoginResponse => UserLoginResponse.decode(value),
+  },
+} as const;
+
+export interface UserServiceServer extends UntypedServiceImplementation {
+  register: handleUnaryCall<UserCreateRequest, UserResponse>;
+  login: handleUnaryCall<UserLoginRequest, UserLoginResponse>;
+}
+
+export interface UserServiceClient extends Client {
+  register(
+    request: UserCreateRequest,
+    callback: (error: ServiceError | null, response: UserResponse) => void,
+  ): ClientUnaryCall;
+  register(
+    request: UserCreateRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: UserResponse) => void,
+  ): ClientUnaryCall;
+  register(
+    request: UserCreateRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: UserResponse) => void,
+  ): ClientUnaryCall;
+  login(
+    request: UserLoginRequest,
+    callback: (error: ServiceError | null, response: UserLoginResponse) => void,
+  ): ClientUnaryCall;
+  login(
+    request: UserLoginRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: UserLoginResponse) => void,
+  ): ClientUnaryCall;
+  login(
+    request: UserLoginRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: UserLoginResponse) => void,
+  ): ClientUnaryCall;
+}
+
+export const UserServiceClient = makeGenericClientConstructor(UserServiceService, "user.UserService") as unknown as {
+  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): UserServiceClient;
+  service: typeof UserServiceService;
+  serviceName: string;
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;

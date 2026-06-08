@@ -6,7 +6,7 @@ import {
   unregisterSocket,
   broadcastToRoom,
   roomsForUser,
-} from '../store/rooms.js';
+} from '../store/rooms';
 
 type Incoming =
   | { type: 'hello'; username: string }

@@ -14,6 +14,7 @@ export interface User {
   name: string;
   username: string;
   password: string;
+  token: string;
 }
 
 export interface Room {
@@ -25,7 +26,7 @@ export interface Room {
 }
 
 function createBaseUser(): User {
-  return { id: 0, name: "", username: "", password: "" };
+  return { id: 0, name: "", username: "", password: "", token: "" };
 }
 
 export const User: MessageFns<User> = {
@@ -41,6 +42,9 @@ export const User: MessageFns<User> = {
     }
     if (message.password !== "") {
       writer.uint32(34).string(message.password);
+    }
+    if (message.token !== "") {
+      writer.uint32(42).string(message.token);
     }
     return writer;
   },
@@ -84,6 +88,14 @@ export const User: MessageFns<User> = {
           message.password = reader.string();
           continue;
         }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.token = reader.string();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -99,6 +111,7 @@ export const User: MessageFns<User> = {
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       username: isSet(object.username) ? globalThis.String(object.username) : "",
       password: isSet(object.password) ? globalThis.String(object.password) : "",
+      token: isSet(object.token) ? globalThis.String(object.token) : "",
     };
   },
 
@@ -116,6 +129,9 @@ export const User: MessageFns<User> = {
     if (message.password !== "") {
       obj.password = message.password;
     }
+    if (message.token !== "") {
+      obj.token = message.token;
+    }
     return obj;
   },
 
@@ -128,6 +144,7 @@ export const User: MessageFns<User> = {
     message.name = object.name ?? "";
     message.username = object.username ?? "";
     message.password = object.password ?? "";
+    message.token = object.token ?? "";
     return message;
   },
 };

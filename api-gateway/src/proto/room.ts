@@ -6,6 +6,18 @@
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
+import {
+  type CallOptions,
+  type ChannelCredentials,
+  Client,
+  type ClientOptions,
+  type ClientUnaryCall,
+  type handleUnaryCall,
+  makeGenericClientConstructor,
+  type Metadata,
+  type ServiceError,
+  type UntypedServiceImplementation,
+} from "@grpc/grpc-js";
 import { UserResponse } from "./user";
 
 export const protobufPackage = "room";
@@ -51,12 +63,22 @@ export interface RoomCreateRequest {
   usersIds: string[];
 }
 
+export interface RoomListRequest {
+  forward: boolean;
+  cursor: number;
+  size: number;
+}
+
 export interface RoomResponse {
   name: string;
   description: string;
   background: string;
   backgroundType: string;
   users: UserResponse[];
+}
+
+export interface RoomListResponse {
+  rooms: RoomResponse[];
 }
 
 function createBaseRoomCreateRequest(): RoomCreateRequest {
@@ -191,6 +213,98 @@ export const RoomCreateRequest: MessageFns<RoomCreateRequest> = {
   },
 };
 
+function createBaseRoomListRequest(): RoomListRequest {
+  return { forward: false, cursor: 0, size: 0 };
+}
+
+export const RoomListRequest: MessageFns<RoomListRequest> = {
+  encode(message: RoomListRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.forward !== false) {
+      writer.uint32(8).bool(message.forward);
+    }
+    if (message.cursor !== 0) {
+      writer.uint32(16).int32(message.cursor);
+    }
+    if (message.size !== 0) {
+      writer.uint32(24).int32(message.size);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): RoomListRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoomListRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.forward = reader.bool();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.cursor = reader.int32();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.size = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RoomListRequest {
+    return {
+      forward: isSet(object.forward) ? globalThis.Boolean(object.forward) : false,
+      cursor: isSet(object.cursor) ? globalThis.Number(object.cursor) : 0,
+      size: isSet(object.size) ? globalThis.Number(object.size) : 0,
+    };
+  },
+
+  toJSON(message: RoomListRequest): unknown {
+    const obj: any = {};
+    if (message.forward !== false) {
+      obj.forward = message.forward;
+    }
+    if (message.cursor !== 0) {
+      obj.cursor = Math.round(message.cursor);
+    }
+    if (message.size !== 0) {
+      obj.size = Math.round(message.size);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<RoomListRequest>): RoomListRequest {
+    return RoomListRequest.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RoomListRequest>): RoomListRequest {
+    const message = createBaseRoomListRequest();
+    message.forward = object.forward ?? false;
+    message.cursor = object.cursor ?? 0;
+    message.size = object.size ?? 0;
+    return message;
+  },
+};
+
 function createBaseRoomResponse(): RoomResponse {
   return { name: "", description: "", background: "", backgroundType: "", users: [] };
 }
@@ -317,6 +431,132 @@ export const RoomResponse: MessageFns<RoomResponse> = {
     message.users = object.users?.map((e) => UserResponse.fromPartial(e)) || [];
     return message;
   },
+};
+
+function createBaseRoomListResponse(): RoomListResponse {
+  return { rooms: [] };
+}
+
+export const RoomListResponse: MessageFns<RoomListResponse> = {
+  encode(message: RoomListResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.rooms) {
+      RoomResponse.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): RoomListResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoomListResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.rooms.push(RoomResponse.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RoomListResponse {
+    return {
+      rooms: globalThis.Array.isArray(object?.rooms) ? object.rooms.map((e: any) => RoomResponse.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: RoomListResponse): unknown {
+    const obj: any = {};
+    if (message.rooms?.length) {
+      obj.rooms = message.rooms.map((e) => RoomResponse.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<RoomListResponse>): RoomListResponse {
+    return RoomListResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RoomListResponse>): RoomListResponse {
+    const message = createBaseRoomListResponse();
+    message.rooms = object.rooms?.map((e) => RoomResponse.fromPartial(e)) || [];
+    return message;
+  },
+};
+
+export type RoomServiceService = typeof RoomServiceService;
+export const RoomServiceService = {
+  createRoom: {
+    path: "/room.RoomService/CreateRoom" as const,
+    requestStream: false as const,
+    responseStream: false as const,
+    requestSerialize: (value: RoomCreateRequest): Buffer => Buffer.from(RoomCreateRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): RoomCreateRequest => RoomCreateRequest.decode(value),
+    responseSerialize: (value: RoomResponse): Buffer => Buffer.from(RoomResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): RoomResponse => RoomResponse.decode(value),
+  },
+  getListRoom: {
+    path: "/room.RoomService/GetListRoom" as const,
+    requestStream: false as const,
+    responseStream: false as const,
+    requestSerialize: (value: RoomListRequest): Buffer => Buffer.from(RoomListRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): RoomListRequest => RoomListRequest.decode(value),
+    responseSerialize: (value: RoomListResponse): Buffer => Buffer.from(RoomListResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): RoomListResponse => RoomListResponse.decode(value),
+  },
+} as const;
+
+export interface RoomServiceServer extends UntypedServiceImplementation {
+  createRoom: handleUnaryCall<RoomCreateRequest, RoomResponse>;
+  getListRoom: handleUnaryCall<RoomListRequest, RoomListResponse>;
+}
+
+export interface RoomServiceClient extends Client {
+  createRoom(
+    request: RoomCreateRequest,
+    callback: (error: ServiceError | null, response: RoomResponse) => void,
+  ): ClientUnaryCall;
+  createRoom(
+    request: RoomCreateRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: RoomResponse) => void,
+  ): ClientUnaryCall;
+  createRoom(
+    request: RoomCreateRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: RoomResponse) => void,
+  ): ClientUnaryCall;
+  getListRoom(
+    request: RoomListRequest,
+    callback: (error: ServiceError | null, response: RoomListResponse) => void,
+  ): ClientUnaryCall;
+  getListRoom(
+    request: RoomListRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: RoomListResponse) => void,
+  ): ClientUnaryCall;
+  getListRoom(
+    request: RoomListRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: RoomListResponse) => void,
+  ): ClientUnaryCall;
+}
+
+export const RoomServiceClient = makeGenericClientConstructor(RoomServiceService, "room.RoomService") as unknown as {
+  new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): RoomServiceClient;
+  service: typeof RoomServiceService;
+  serviceName: string;
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
