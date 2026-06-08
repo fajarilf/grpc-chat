@@ -19,10 +19,25 @@ message RoomCreateRequest {
     repeated string users_ids = 5;
 }
 
+message RoomListRequest {
+    bool forward = 1;
+    int32 cursor = 2;
+    int32 size = 3;
+}
+
 message RoomResponse {
     string name = 1;
     string description = 2;
     string background = 3;
     string background_type = 4;
     repeated user.UserResponse users = 5;
+}
+
+message RoomListResponse {
+    repeated RoomResponse rooms = 1;
+}
+
+service RoomService {
+    rpc CreateRoom(RoomCreateRequest) returns (RoomResponse);
+    rpc GetListRoom(RoomListRequest) returns (RoomListResponse);
 }
