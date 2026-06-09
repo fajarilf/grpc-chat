@@ -1,31 +1,37 @@
 package services
 
 import (
+	"context"
+
 	pb "github.com/fajarilf/grpc-chat-proto/proto"
+	"github.com/fajarilf/grpc-chat-server/models"
+	"github.com/fajarilf/grpc-chat-server/repositories"
 )
 
-type RoomService struct{}
-
-func NewRoomService() *RoomService {
-	return &RoomService{}
+type RoomService struct {
+	repo *repositories.RoomRepository
 }
 
-func (rs *RoomService) CreateRoom(param *pb.RoomCreateRequest) *pb.RoomResponse {
+func NewRoomService(repo *repositories.RoomRepository) *RoomService {
+	return &RoomService{
+		repo: repo,
+	}
+}
+
+func (rs *RoomService) CreateRoom(ctx context.Context, param *pb.RoomCreateRequest) *pb.RoomResponse {
 	return &pb.RoomResponse{}
 }
 
-// GetListRoom returns a page of mock rooms. cursor is the index to start from
-// and size caps the page (defaulting to the full list when size <= 0).
-func (rs *RoomService) GetListRoom(param *pb.RoomListRequest) *pb.RoomListResponse {
-	start := max(int(param.GetCursor()), 0)
-	start = min(start, len(mockRooms))
+func (rs *RoomService) GetListRoom(ctx context.Context, param *pb.RoomListRequest) *pb.RoomListResponse {
+	result, _ := rs.repo.Get(ctx, param)
 
-	end := len(mockRooms)
-	if size := int(param.GetSize()); size > 0 && start+size < end {
-		end = start + size
+	rooms := []*pb.RoomResponse{}
+	for _, val := range result {
+		room := models.ToRoomResponse(val)
+		rooms = append(rooms, room)
 	}
 
 	return &pb.RoomListResponse{
-		Rooms: mockRooms[start:end],
+		Rooms: rooms,
 	}
 }

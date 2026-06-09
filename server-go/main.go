@@ -1,27 +1,47 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net"
+	"time"
 
-	roompb "github.com/fajarilf/grpc-chat-proto/proto"
-	pb "github.com/fajarilf/grpc-chat-server/proto"
+	pb "github.com/fajarilf/grpc-chat-proto/proto"
+	server "github.com/fajarilf/grpc-chat-server/grpc-server"
+	"github.com/fajarilf/grpc-chat-server/repositories"
+	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 )
 
 func main() {
+	_ = godotenv.Load()
+
 	listener, err := net.Listen("tcp", ":50051")
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	pool, err := repositories.Connect(ctx)
+	if err != nil {
+		log.Fatalf("database connection failed: %v", err)
+	}
+	defer pool.Close()
+	log.Println("connected to PostgreSQL")
+
 	grpcServer := grpc.NewServer()
 
-	chatServer := NewChatServer()
-	pb.RegisterChatServiceServer(grpcServer, chatServer)
+	// repository
+	roomRepo := repositories.NewRoomRepository(pool)
 
-	roomServer := NewRoomServer()
-	roompb.RegisterRoomServiceServer(grpcServer, roomServer)
+	// register grpc server
+	roomServer := server.NewRoomServer(roomRepo)
+	pb.RegisterRoomServiceServer(grpcServer, roomServer)
+
+	userServer := server.NewUserServer()
+	pb.RegisterUserServiceServer(grpcServer, userServer)
 
 	log.Println("Chat server started on :50051")
 
