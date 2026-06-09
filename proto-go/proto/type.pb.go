@@ -173,6 +173,144 @@ func (x *Room) GetBackgroundType() string {
 	return ""
 }
 
+// Shared response shapes — referenced by both user.proto and room.proto, so
+// they live here to keep those two files from importing each other.
+type UserResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Username      string                 `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserResponse) Reset() {
+	*x = UserResponse{}
+	mi := &file_type_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserResponse) ProtoMessage() {}
+
+func (x *UserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_type_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserResponse.ProtoReflect.Descriptor instead.
+func (*UserResponse) Descriptor() ([]byte, []int) {
+	return file_type_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *UserResponse) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *UserResponse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UserResponse) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+type RoomResponse struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name           string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description    string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Background     string                 `protobuf:"bytes,4,opt,name=background,proto3" json:"background,omitempty"`
+	BackgroundType string                 `protobuf:"bytes,5,opt,name=background_type,json=backgroundType,proto3" json:"background_type,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *RoomResponse) Reset() {
+	*x = RoomResponse{}
+	mi := &file_type_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RoomResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RoomResponse) ProtoMessage() {}
+
+func (x *RoomResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_type_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RoomResponse.ProtoReflect.Descriptor instead.
+func (*RoomResponse) Descriptor() ([]byte, []int) {
+	return file_type_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *RoomResponse) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
+func (x *RoomResponse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *RoomResponse) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *RoomResponse) GetBackground() string {
+	if x != nil {
+		return x.Background
+	}
+	return ""
+}
+
+func (x *RoomResponse) GetBackgroundType() string {
+	if x != nil {
+		return x.BackgroundType
+	}
+	return ""
+}
+
 var File_type_proto protoreflect.FileDescriptor
 
 const file_type_proto_rawDesc = "" +
@@ -186,6 +324,18 @@ const file_type_proto_rawDesc = "" +
 	"\bpassword\x18\x04 \x01(\tR\bpassword\x12\x14\n" +
 	"\x05token\x18\x05 \x01(\tR\x05token\"\x95\x01\n" +
 	"\x04Room\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x1e\n" +
+	"\n" +
+	"background\x18\x04 \x01(\tR\n" +
+	"background\x12'\n" +
+	"\x0fbackground_type\x18\x05 \x01(\tR\x0ebackgroundType\"N\n" +
+	"\fUserResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
+	"\busername\x18\x03 \x01(\tR\busername\"\x9d\x01\n" +
+	"\fRoomResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x1e\n" +
@@ -206,10 +356,12 @@ func file_type_proto_rawDescGZIP() []byte {
 	return file_type_proto_rawDescData
 }
 
-var file_type_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_type_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_type_proto_goTypes = []any{
-	(*User)(nil), // 0: type.User
-	(*Room)(nil), // 1: type.Room
+	(*User)(nil),         // 0: type.User
+	(*Room)(nil),         // 1: type.Room
+	(*UserResponse)(nil), // 2: type.UserResponse
+	(*RoomResponse)(nil), // 3: type.RoomResponse
 }
 var file_type_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -230,7 +382,7 @@ func file_type_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_type_proto_rawDesc), len(file_type_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

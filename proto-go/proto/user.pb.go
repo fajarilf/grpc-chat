@@ -185,30 +185,30 @@ func (x *UserLoginResponse) GetToken() string {
 	return ""
 }
 
-type UserResponse struct {
+type UserResponseWithRoom struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Username      string                 `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`
-	Rooms         []*Room                `protobuf:"bytes,4,rep,name=rooms,proto3" json:"rooms,omitempty"`
+	Rooms         []*RoomResponse        `protobuf:"bytes,4,rep,name=rooms,proto3" json:"rooms,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UserResponse) Reset() {
-	*x = UserResponse{}
+func (x *UserResponseWithRoom) Reset() {
+	*x = UserResponseWithRoom{}
 	mi := &file_user_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UserResponse) String() string {
+func (x *UserResponseWithRoom) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UserResponse) ProtoMessage() {}
+func (*UserResponseWithRoom) ProtoMessage() {}
 
-func (x *UserResponse) ProtoReflect() protoreflect.Message {
+func (x *UserResponseWithRoom) ProtoReflect() protoreflect.Message {
 	mi := &file_user_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -220,33 +220,33 @@ func (x *UserResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserResponse.ProtoReflect.Descriptor instead.
-func (*UserResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use UserResponseWithRoom.ProtoReflect.Descriptor instead.
+func (*UserResponseWithRoom) Descriptor() ([]byte, []int) {
 	return file_user_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *UserResponse) GetId() int32 {
+func (x *UserResponseWithRoom) GetId() int32 {
 	if x != nil {
 		return x.Id
 	}
 	return 0
 }
 
-func (x *UserResponse) GetName() string {
+func (x *UserResponseWithRoom) GetName() string {
 	if x != nil {
 		return x.Name
 	}
 	return ""
 }
 
-func (x *UserResponse) GetUsername() string {
+func (x *UserResponseWithRoom) GetUsername() string {
 	if x != nil {
 		return x.Username
 	}
 	return ""
 }
 
-func (x *UserResponse) GetRooms() []*Room {
+func (x *UserResponseWithRoom) GetRooms() []*RoomResponse {
 	if x != nil {
 		return x.Rooms
 	}
@@ -269,15 +269,14 @@ const file_user_proto_rawDesc = "" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"E\n" +
 	"\x11UserLoginResponse\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x14\n" +
-	"\x05token\x18\x02 \x01(\tR\x05token\"p\n" +
-	"\fUserResponse\x12\x0e\n" +
+	"\x05token\x18\x02 \x01(\tR\x05token\"\x80\x01\n" +
+	"\x14UserResponseWithRoom\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
-	"\busername\x18\x03 \x01(\tR\busername\x12 \n" +
-	"\x05rooms\x18\x04 \x03(\v2\n" +
-	".type.RoomR\x05rooms2\x80\x01\n" +
+	"\busername\x18\x03 \x01(\tR\busername\x12(\n" +
+	"\x05rooms\x18\x04 \x03(\v2\x12.type.RoomResponseR\x05rooms2\x80\x01\n" +
 	"\vUserService\x127\n" +
-	"\bRegister\x12\x17.user.UserCreateRequest\x1a\x12.user.UserResponse\x128\n" +
+	"\bRegister\x12\x17.user.UserCreateRequest\x1a\x12.type.UserResponse\x128\n" +
 	"\x05Login\x12\x16.user.UserLoginRequest\x1a\x17.user.UserLoginResponseB(Z&github.com/fajarilf/grpc-chat/proto-gob\x06proto3"
 
 var (
@@ -294,17 +293,18 @@ func file_user_proto_rawDescGZIP() []byte {
 
 var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_user_proto_goTypes = []any{
-	(*UserCreateRequest)(nil), // 0: user.UserCreateRequest
-	(*UserLoginRequest)(nil),  // 1: user.UserLoginRequest
-	(*UserLoginResponse)(nil), // 2: user.UserLoginResponse
-	(*UserResponse)(nil),      // 3: user.UserResponse
-	(*Room)(nil),              // 4: type.Room
+	(*UserCreateRequest)(nil),    // 0: user.UserCreateRequest
+	(*UserLoginRequest)(nil),     // 1: user.UserLoginRequest
+	(*UserLoginResponse)(nil),    // 2: user.UserLoginResponse
+	(*UserResponseWithRoom)(nil), // 3: user.UserResponseWithRoom
+	(*RoomResponse)(nil),         // 4: type.RoomResponse
+	(*UserResponse)(nil),         // 5: type.UserResponse
 }
 var file_user_proto_depIdxs = []int32{
-	4, // 0: user.UserResponse.rooms:type_name -> type.Room
+	4, // 0: user.UserResponseWithRoom.rooms:type_name -> type.RoomResponse
 	0, // 1: user.UserService.Register:input_type -> user.UserCreateRequest
 	1, // 2: user.UserService.Login:input_type -> user.UserLoginRequest
-	3, // 3: user.UserService.Register:output_type -> user.UserResponse
+	5, // 3: user.UserService.Register:output_type -> type.UserResponse
 	2, // 4: user.UserService.Login:output_type -> user.UserLoginResponse
 	3, // [3:5] is the sub-list for method output_type
 	1, // [1:3] is the sub-list for method input_type

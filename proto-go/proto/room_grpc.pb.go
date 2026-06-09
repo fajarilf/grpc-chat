@@ -21,7 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	RoomService_CreateRoom_FullMethodName  = "/room.RoomService/CreateRoom"
-	RoomService_GetRoomByid_FullMethodName = "/room.RoomService/GetRoomByid"
+	RoomService_GetRoomById_FullMethodName = "/room.RoomService/GetRoomById"
 	RoomService_GetListRoom_FullMethodName = "/room.RoomService/GetListRoom"
 	RoomService_DeleteRoom_FullMethodName  = "/room.RoomService/DeleteRoom"
 )
@@ -30,8 +30,8 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RoomServiceClient interface {
-	CreateRoom(ctx context.Context, in *RoomCreateRequest, opts ...grpc.CallOption) (*RoomResponse, error)
-	GetRoomByid(ctx context.Context, in *RoomId, opts ...grpc.CallOption) (*RoomResponse, error)
+	CreateRoom(ctx context.Context, in *RoomCreateRequest, opts ...grpc.CallOption) (*RoomResponseWithUser, error)
+	GetRoomById(ctx context.Context, in *RoomId, opts ...grpc.CallOption) (*RoomResponseWithUser, error)
 	GetListRoom(ctx context.Context, in *RoomListRequest, opts ...grpc.CallOption) (*RoomListResponse, error)
 	DeleteRoom(ctx context.Context, in *RoomId, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
@@ -44,9 +44,9 @@ func NewRoomServiceClient(cc grpc.ClientConnInterface) RoomServiceClient {
 	return &roomServiceClient{cc}
 }
 
-func (c *roomServiceClient) CreateRoom(ctx context.Context, in *RoomCreateRequest, opts ...grpc.CallOption) (*RoomResponse, error) {
+func (c *roomServiceClient) CreateRoom(ctx context.Context, in *RoomCreateRequest, opts ...grpc.CallOption) (*RoomResponseWithUser, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RoomResponse)
+	out := new(RoomResponseWithUser)
 	err := c.cc.Invoke(ctx, RoomService_CreateRoom_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -54,10 +54,10 @@ func (c *roomServiceClient) CreateRoom(ctx context.Context, in *RoomCreateReques
 	return out, nil
 }
 
-func (c *roomServiceClient) GetRoomByid(ctx context.Context, in *RoomId, opts ...grpc.CallOption) (*RoomResponse, error) {
+func (c *roomServiceClient) GetRoomById(ctx context.Context, in *RoomId, opts ...grpc.CallOption) (*RoomResponseWithUser, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RoomResponse)
-	err := c.cc.Invoke(ctx, RoomService_GetRoomByid_FullMethodName, in, out, cOpts...)
+	out := new(RoomResponseWithUser)
+	err := c.cc.Invoke(ctx, RoomService_GetRoomById_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -88,8 +88,8 @@ func (c *roomServiceClient) DeleteRoom(ctx context.Context, in *RoomId, opts ...
 // All implementations must embed UnimplementedRoomServiceServer
 // for forward compatibility.
 type RoomServiceServer interface {
-	CreateRoom(context.Context, *RoomCreateRequest) (*RoomResponse, error)
-	GetRoomByid(context.Context, *RoomId) (*RoomResponse, error)
+	CreateRoom(context.Context, *RoomCreateRequest) (*RoomResponseWithUser, error)
+	GetRoomById(context.Context, *RoomId) (*RoomResponseWithUser, error)
 	GetListRoom(context.Context, *RoomListRequest) (*RoomListResponse, error)
 	DeleteRoom(context.Context, *RoomId) (*emptypb.Empty, error)
 	mustEmbedUnimplementedRoomServiceServer()
@@ -102,11 +102,11 @@ type RoomServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedRoomServiceServer struct{}
 
-func (UnimplementedRoomServiceServer) CreateRoom(context.Context, *RoomCreateRequest) (*RoomResponse, error) {
+func (UnimplementedRoomServiceServer) CreateRoom(context.Context, *RoomCreateRequest) (*RoomResponseWithUser, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateRoom not implemented")
 }
-func (UnimplementedRoomServiceServer) GetRoomByid(context.Context, *RoomId) (*RoomResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetRoomByid not implemented")
+func (UnimplementedRoomServiceServer) GetRoomById(context.Context, *RoomId) (*RoomResponseWithUser, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetRoomById not implemented")
 }
 func (UnimplementedRoomServiceServer) GetListRoom(context.Context, *RoomListRequest) (*RoomListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetListRoom not implemented")
@@ -153,20 +153,20 @@ func _RoomService_CreateRoom_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _RoomService_GetRoomByid_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _RoomService_GetRoomById_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RoomId)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RoomServiceServer).GetRoomByid(ctx, in)
+		return srv.(RoomServiceServer).GetRoomById(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: RoomService_GetRoomByid_FullMethodName,
+		FullMethod: RoomService_GetRoomById_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RoomServiceServer).GetRoomByid(ctx, req.(*RoomId))
+		return srv.(RoomServiceServer).GetRoomById(ctx, req.(*RoomId))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -219,8 +219,8 @@ var RoomService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _RoomService_CreateRoom_Handler,
 		},
 		{
-			MethodName: "GetRoomByid",
-			Handler:    _RoomService_GetRoomByid_Handler,
+			MethodName: "GetRoomById",
+			Handler:    _RoomService_GetRoomById_Handler,
 		},
 		{
 			MethodName: "GetListRoom",
