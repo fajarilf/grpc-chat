@@ -16,6 +16,13 @@ type Room struct {
 	UpdatedAt      time.Time `db:"updated_at"`
 }
 
+type RoomCursor struct {
+	Rooms      []*Room
+	NextCursor int
+	PrevCursor int
+	HasMore    bool
+}
+
 func GetStringBgType(num int) string {
 	if name, ok := pb.BgTypes_name[int32(num)]; ok {
 		return name
@@ -26,9 +33,26 @@ func GetStringBgType(num int) string {
 
 func ToRoomResponse(entity *Room) *pb.RoomResponse {
 	return &pb.RoomResponse{
+		Id:             int32(entity.Id),
 		Name:           entity.Name,
 		Description:    entity.Description,
 		Background:     entity.Background,
 		BackgroundType: GetStringBgType(int(entity.BackgroundType)),
+	}
+}
+
+func ToRoomResponseWithUser(entity *Room, members []*User) *pb.RoomResponseWithUser {
+	users := make([]*pb.UserResponse, 0, len(members))
+	for _, m := range members {
+		users = append(users, ToUserResponse(m))
+	}
+
+	return &pb.RoomResponseWithUser{
+		Id:             int32(entity.Id),
+		Name:           entity.Name,
+		Description:    entity.Description,
+		Background:     entity.Background,
+		BackgroundType: GetStringBgType(int(entity.BackgroundType)),
+		Users:          users,
 	}
 }

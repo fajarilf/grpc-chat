@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"context"
-	"log"
+	"slices"
 
 	pb "github.com/fajarilf/grpc-chat-proto/proto"
 	"github.com/fajarilf/grpc-chat-server/models"
@@ -20,41 +20,62 @@ func NewRoomRepository(pool *pgxpool.Pool) *RoomRepository {
 	}
 }
 
-func (r *RoomRepository) Get(ctx context.Context, param *pb.RoomListRequest) ([]*models.Room, error) {
-	var (
-		rows pgx.Rows
-		err  error
+func (r *RoomRepository) Create(ctx context.Context, param *pb.RoomCreateRequest) (*models.Room, error) {
+	rows, err := r.pool.Query(ctx,
+		`INSERT INTO rooms (name, description, background, background_type)
+		 VALUES ($1, $2, $3, $4)
+		 RETURNING *`,
+		param.Name, param.Description, param.Background, param.BackgroundType,
 	)
+	if err != nil {
+		return nil, err
+	}
+
+	room, err := pgx.CollectOneRow(rows, pgx.RowToAddrOfStructByName[models.Room])
+	if err != nil {
+		return nil, err
+	}
+
+	return room, nil
+}
+
+func (r *RoomRepository) Get(ctx context.Context, param *pb.RoomListRequest) (*models.RoomCursor, error) {
+	var (
+		size     int
+		rows     pgx.Rows
+		err      error
+		backward bool
+	)
+
+	size = int(param.Size)
 
 	switch {
 	case param.Cursor == 0:
-		log.Print("case 1", param.Cursor, param.Size)
 		rows, err = r.pool.Query(ctx,
 			`SELECT id, name, description, background, background_type, created_at, updated_at 
 			 FROM rooms
 			 ORDER BY id DESC 
 			 LIMIT $1`,
-			param.Size,
+			param.Size+1,
 		)
 	case param.Forward:
-		log.Print("case 2", param.Cursor, param.Size)
-		rows, err = r.pool.Query(ctx,
-			`SELECT id, name, description, background, background_type, created_at, updated_at 
-			 FROM rooms
-			 WHERE id > $1 
-			 ORDER BY id DESC 
-			 LIMIT $2`,
-			param.Cursor, param.Size,
-		)
-	default:
-		log.Print("case 3", param.Cursor, param.Size)
 		rows, err = r.pool.Query(ctx,
 			`SELECT id, name, description, background, background_type, created_at, updated_at 
 			 FROM rooms
 			 WHERE id < $1 
+			 ORDER BY id DESC 
+			 LIMIT $2`,
+			param.Cursor, param.Size+1,
+		)
+	default:
+		backward = true
+		rows, err = r.pool.Query(ctx,
+			`SELECT id, name, description, background, background_type, created_at, updated_at 
+			 FROM rooms
+			 WHERE id > $1 
 			 ORDER BY id ASC 
 			 LIMIT $2`,
-			param.Cursor, param.Size,
+			param.Cursor, param.Size+1,
 		)
 	}
 	if err != nil {
@@ -66,7 +87,62 @@ func (r *RoomRepository) Get(ctx context.Context, param *pb.RoomListRequest) ([]
 		return nil, err
 	}
 
-	return rooms, nil
+	hasMore := len(rooms) > size
+	if hasMore {
+		rooms = rooms[:size]
+	}
+
+	if backward {
+		slices.Reverse(rooms)
+	}
+
+	result := &models.RoomCursor{
+		Rooms:   rooms,
+		HasMore: hasMore,
+	}
+
+	if len(rooms) > 0 {
+		result.NextCursor = rooms[len(rooms)-1].Id
+		result.PrevCursor = rooms[0].Id
+	}
+
+	return result, nil
+}
+
+// MembersByRoomIDs returns the members of each room, keyed by room id, in a
+// single query — avoids an N+1 of one membership lookup per room.
+func (r *RoomRepository) MembersByRoomIDs(ctx context.Context, roomIDs []int) (map[int][]*models.User, error) {
+	out := make(map[int][]*models.User)
+	if len(roomIDs) == 0 {
+		return out, nil
+	}
+
+	rows, err := r.pool.Query(ctx,
+		`SELECT ru.room_id, u.id, u.name, u.username
+		 FROM room_users ru
+		 JOIN users u ON u.id = ru.user_id
+		 WHERE ru.room_id = ANY($1)
+		 ORDER BY ru.room_id, u.id`,
+		roomIDs, // pgx encodes []int as a Postgres integer[] for ANY()
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var (
+			roomID int
+			user   models.User
+		)
+		if err := rows.Scan(&roomID, &user.Id, &user.Name, &user.Username); err != nil {
+			return nil, err
+		}
+		member := user // copy before taking its address inside the loop
+		out[roomID] = append(out[roomID], &member)
+	}
+
+	return out, rows.Err()
 }
 
 func (r *RoomRepository) GetById(ctx context.Context, id int) (*models.Room, error) {

@@ -21,10 +21,14 @@ func NewRoomServer(repo *repositories.RoomRepository) *RoomServer {
 	return &RoomServer{service: services.NewRoomService(repo)}
 }
 
-func (s *RoomServer) CreateRoom(ctx context.Context, req *pb.RoomCreateRequest) (*pb.RoomResponse, error) {
+func (s *RoomServer) CreateRoom(ctx context.Context, req *pb.RoomCreateRequest) (*pb.RoomResponseWithUser, error) {
 	return s.service.CreateRoom(ctx, req), nil
 }
 
 func (s *RoomServer) GetListRoom(ctx context.Context, req *pb.RoomListRequest) (*pb.RoomListResponse, error) {
 	return s.service.GetListRoom(ctx, req), nil
+}
+
+func (s *RoomServer) GetRoomById(ctx context.Context, req *pb.RoomId) (*pb.RoomResponseWithUser, error) {
+	return s.service.GetRoomById(ctx, req), nil
 }
