@@ -9,6 +9,7 @@ package proto_go
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -203,20 +204,65 @@ func (x *RoomListRequest) GetSize() int32 {
 	return 0
 }
 
+type RoomId struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RoomId) Reset() {
+	*x = RoomId{}
+	mi := &file_room_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RoomId) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RoomId) ProtoMessage() {}
+
+func (x *RoomId) ProtoReflect() protoreflect.Message {
+	mi := &file_room_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RoomId.ProtoReflect.Descriptor instead.
+func (*RoomId) Descriptor() ([]byte, []int) {
+	return file_room_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *RoomId) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
+}
+
 type RoomResponse struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
-	Name           string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Description    string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Background     string                 `protobuf:"bytes,3,opt,name=background,proto3" json:"background,omitempty"`
-	BackgroundType string                 `protobuf:"bytes,4,opt,name=background_type,json=backgroundType,proto3" json:"background_type,omitempty"`
-	Users          []*UserResponse        `protobuf:"bytes,5,rep,name=users,proto3" json:"users,omitempty"`
+	Id             int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name           string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description    string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Background     string                 `protobuf:"bytes,4,opt,name=background,proto3" json:"background,omitempty"`
+	BackgroundType string                 `protobuf:"bytes,5,opt,name=background_type,json=backgroundType,proto3" json:"background_type,omitempty"`
+	Users          []*UserResponse        `protobuf:"bytes,6,rep,name=users,proto3" json:"users,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
 
 func (x *RoomResponse) Reset() {
 	*x = RoomResponse{}
-	mi := &file_room_proto_msgTypes[2]
+	mi := &file_room_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -228,7 +274,7 @@ func (x *RoomResponse) String() string {
 func (*RoomResponse) ProtoMessage() {}
 
 func (x *RoomResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_room_proto_msgTypes[2]
+	mi := &file_room_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -241,7 +287,14 @@ func (x *RoomResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RoomResponse.ProtoReflect.Descriptor instead.
 func (*RoomResponse) Descriptor() ([]byte, []int) {
-	return file_room_proto_rawDescGZIP(), []int{2}
+	return file_room_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *RoomResponse) GetId() int32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
 }
 
 func (x *RoomResponse) GetName() string {
@@ -282,13 +335,16 @@ func (x *RoomResponse) GetUsers() []*UserResponse {
 type RoomListResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Rooms         []*RoomResponse        `protobuf:"bytes,1,rep,name=rooms,proto3" json:"rooms,omitempty"`
+	NextCursor    int32                  `protobuf:"varint,2,opt,name=next_cursor,json=nextCursor,proto3" json:"next_cursor,omitempty"`
+	PrevCursor    int32                  `protobuf:"varint,3,opt,name=prev_cursor,json=prevCursor,proto3" json:"prev_cursor,omitempty"`
+	HasMore       bool                   `protobuf:"varint,4,opt,name=has_more,json=hasMore,proto3" json:"has_more,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *RoomListResponse) Reset() {
 	*x = RoomListResponse{}
-	mi := &file_room_proto_msgTypes[3]
+	mi := &file_room_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -300,7 +356,7 @@ func (x *RoomListResponse) String() string {
 func (*RoomListResponse) ProtoMessage() {}
 
 func (x *RoomListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_room_proto_msgTypes[3]
+	mi := &file_room_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -313,7 +369,7 @@ func (x *RoomListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RoomListResponse.ProtoReflect.Descriptor instead.
 func (*RoomListResponse) Descriptor() ([]byte, []int) {
-	return file_room_proto_rawDescGZIP(), []int{3}
+	return file_room_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *RoomListResponse) GetRooms() []*RoomResponse {
@@ -323,13 +379,34 @@ func (x *RoomListResponse) GetRooms() []*RoomResponse {
 	return nil
 }
 
+func (x *RoomListResponse) GetNextCursor() int32 {
+	if x != nil {
+		return x.NextCursor
+	}
+	return 0
+}
+
+func (x *RoomListResponse) GetPrevCursor() int32 {
+	if x != nil {
+		return x.PrevCursor
+	}
+	return 0
+}
+
+func (x *RoomListResponse) GetHasMore() bool {
+	if x != nil {
+		return x.HasMore
+	}
+	return false
+}
+
 var File_room_proto protoreflect.FileDescriptor
 
 const file_room_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
 	"room.proto\x12\x04room\x1a\n" +
-	"user.proto\"\xbe\x01\n" +
+	"user.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xbe\x01\n" +
 	"\x11RoomCreateRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1e\n" +
@@ -341,24 +418,35 @@ const file_room_proto_rawDesc = "" +
 	"\x0fRoomListRequest\x12\x18\n" +
 	"\aforward\x18\x01 \x01(\bR\aforward\x12\x16\n" +
 	"\x06cursor\x18\x02 \x01(\x05R\x06cursor\x12\x12\n" +
-	"\x04size\x18\x03 \x01(\x05R\x04size\"\xb7\x01\n" +
-	"\fRoomResponse\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
-	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1e\n" +
+	"\x04size\x18\x03 \x01(\x05R\x04size\"\x18\n" +
+	"\x06RoomId\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\"\xc7\x01\n" +
+	"\fRoomResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x1e\n" +
 	"\n" +
-	"background\x18\x03 \x01(\tR\n" +
+	"background\x18\x04 \x01(\tR\n" +
 	"background\x12'\n" +
-	"\x0fbackground_type\x18\x04 \x01(\tR\x0ebackgroundType\x12(\n" +
-	"\x05users\x18\x05 \x03(\v2\x12.user.UserResponseR\x05users\"<\n" +
+	"\x0fbackground_type\x18\x05 \x01(\tR\x0ebackgroundType\x12(\n" +
+	"\x05users\x18\x06 \x03(\v2\x12.user.UserResponseR\x05users\"\x99\x01\n" +
 	"\x10RoomListResponse\x12(\n" +
-	"\x05rooms\x18\x01 \x03(\v2\x12.room.RoomResponseR\x05rooms*\x1f\n" +
+	"\x05rooms\x18\x01 \x03(\v2\x12.room.RoomResponseR\x05rooms\x12\x1f\n" +
+	"\vnext_cursor\x18\x02 \x01(\x05R\n" +
+	"nextCursor\x12\x1f\n" +
+	"\vprev_cursor\x18\x03 \x01(\x05R\n" +
+	"prevCursor\x12\x19\n" +
+	"\bhas_more\x18\x04 \x01(\bR\ahasMore*\x1f\n" +
 	"\aBgTypes\x12\t\n" +
 	"\x05COLOR\x10\x00\x12\t\n" +
-	"\x05IMAGE\x10\x012\x86\x01\n" +
+	"\x05IMAGE\x10\x012\xeb\x01\n" +
 	"\vRoomService\x129\n" +
 	"\n" +
-	"CreateRoom\x12\x17.room.RoomCreateRequest\x1a\x12.room.RoomResponse\x12<\n" +
-	"\vGetListRoom\x12\x15.room.RoomListRequest\x1a\x16.room.RoomListResponseB(Z&github.com/fajarilf/grpc-chat/proto-gob\x06proto3"
+	"CreateRoom\x12\x17.room.RoomCreateRequest\x1a\x12.room.RoomResponse\x12/\n" +
+	"\vGetRoomByid\x12\f.room.RoomId\x1a\x12.room.RoomResponse\x12<\n" +
+	"\vGetListRoom\x12\x15.room.RoomListRequest\x1a\x16.room.RoomListResponse\x122\n" +
+	"\n" +
+	"DeleteRoom\x12\f.room.RoomId\x1a\x16.google.protobuf.EmptyB(Z&github.com/fajarilf/grpc-chat/proto-gob\x06proto3"
 
 var (
 	file_room_proto_rawDescOnce sync.Once
@@ -373,25 +461,31 @@ func file_room_proto_rawDescGZIP() []byte {
 }
 
 var file_room_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_room_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_room_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_room_proto_goTypes = []any{
 	(BgTypes)(0),              // 0: room.BgTypes
 	(*RoomCreateRequest)(nil), // 1: room.RoomCreateRequest
 	(*RoomListRequest)(nil),   // 2: room.RoomListRequest
-	(*RoomResponse)(nil),      // 3: room.RoomResponse
-	(*RoomListResponse)(nil),  // 4: room.RoomListResponse
-	(*UserResponse)(nil),      // 5: user.UserResponse
+	(*RoomId)(nil),            // 3: room.RoomId
+	(*RoomResponse)(nil),      // 4: room.RoomResponse
+	(*RoomListResponse)(nil),  // 5: room.RoomListResponse
+	(*UserResponse)(nil),      // 6: user.UserResponse
+	(*emptypb.Empty)(nil),     // 7: google.protobuf.Empty
 }
 var file_room_proto_depIdxs = []int32{
 	0, // 0: room.RoomCreateRequest.background_type:type_name -> room.BgTypes
-	5, // 1: room.RoomResponse.users:type_name -> user.UserResponse
-	3, // 2: room.RoomListResponse.rooms:type_name -> room.RoomResponse
+	6, // 1: room.RoomResponse.users:type_name -> user.UserResponse
+	4, // 2: room.RoomListResponse.rooms:type_name -> room.RoomResponse
 	1, // 3: room.RoomService.CreateRoom:input_type -> room.RoomCreateRequest
-	2, // 4: room.RoomService.GetListRoom:input_type -> room.RoomListRequest
-	3, // 5: room.RoomService.CreateRoom:output_type -> room.RoomResponse
-	4, // 6: room.RoomService.GetListRoom:output_type -> room.RoomListResponse
-	5, // [5:7] is the sub-list for method output_type
-	3, // [3:5] is the sub-list for method input_type
+	3, // 4: room.RoomService.GetRoomByid:input_type -> room.RoomId
+	2, // 5: room.RoomService.GetListRoom:input_type -> room.RoomListRequest
+	3, // 6: room.RoomService.DeleteRoom:input_type -> room.RoomId
+	4, // 7: room.RoomService.CreateRoom:output_type -> room.RoomResponse
+	4, // 8: room.RoomService.GetRoomByid:output_type -> room.RoomResponse
+	5, // 9: room.RoomService.GetListRoom:output_type -> room.RoomListResponse
+	7, // 10: room.RoomService.DeleteRoom:output_type -> google.protobuf.Empty
+	7, // [7:11] is the sub-list for method output_type
+	3, // [3:7] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name
 	3, // [3:3] is the sub-list for extension extendee
 	0, // [0:3] is the sub-list for field type_name
@@ -409,7 +503,7 @@ func file_room_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_room_proto_rawDesc), len(file_room_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
