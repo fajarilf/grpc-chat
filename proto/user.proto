@@ -22,14 +22,14 @@ message UserLoginResponse {
     string token = 2;
 }
 
-message UserResponse {
+message UserResponseWithRoom {
     int32 id = 1;
     string name = 2;
     string username = 3;
-    repeated type.Room rooms = 4;
+    repeated type.RoomResponse rooms = 4;
 }
 
 service UserService {
-    rpc Register(UserCreateRequest) returns (UserResponse);
+    rpc Register(UserCreateRequest) returns (type.UserResponse);
     rpc Login(UserLoginRequest) returns (UserLoginResponse);
 }

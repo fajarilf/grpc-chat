@@ -19,3 +19,19 @@ message Room {
     string background = 4;
     string background_type = 5;
 }
+
+// Shared response shapes — referenced by both user.proto and room.proto, so
+// they live here to keep those two files from importing each other.
+message UserResponse {
+    int32 id = 1;
+    string name = 2;
+    string username = 3;
+}
+
+message RoomResponse {
+    int32 id = 1;
+    string name = 2;
+    string description = 3;
+    string background = 4;
+    string background_type = 5;
+}
