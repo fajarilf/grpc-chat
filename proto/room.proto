@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "user.proto";
+import "google/protobuf/empty.proto";
 
 package room;
 
@@ -25,19 +26,29 @@ message RoomListRequest {
     int32 size = 3;
 }
 
+message RoomId {
+    int32 id = 1;
+}
+
 message RoomResponse {
-    string name = 1;
-    string description = 2;
-    string background = 3;
-    string background_type = 4;
-    repeated user.UserResponse users = 5;
+    int32 id = 1;
+    string name = 2;
+    string description = 3;
+    string background = 4;
+    string background_type = 5;
+    repeated user.UserResponse users = 6;
 }
 
 message RoomListResponse {
     repeated RoomResponse rooms = 1;
+    int32 next_cursor = 2;
+    int32 prev_cursor = 3;
+    bool has_more = 4;
 }
 
 service RoomService {
     rpc CreateRoom(RoomCreateRequest) returns (RoomResponse);
+    rpc GetRoomByid(RoomId) returns (RoomResponse);
     rpc GetListRoom(RoomListRequest) returns (RoomListResponse);
+    rpc DeleteRoom(RoomId) returns (google.protobuf.Empty);
 }
