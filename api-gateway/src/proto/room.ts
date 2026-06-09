@@ -18,6 +18,7 @@ import {
   type ServiceError,
   type UntypedServiceImplementation,
 } from "@grpc/grpc-js";
+import { Empty } from "./google/protobuf/empty";
 import { UserResponse } from "./user";
 
 export const protobufPackage = "room";
@@ -69,7 +70,12 @@ export interface RoomListRequest {
   size: number;
 }
 
+export interface RoomId {
+  id: number;
+}
+
 export interface RoomResponse {
+  id: number;
   name: string;
   description: string;
   background: string;
@@ -79,6 +85,9 @@ export interface RoomResponse {
 
 export interface RoomListResponse {
   rooms: RoomResponse[];
+  nextCursor: number;
+  prevCursor: number;
+  hasMore: boolean;
 }
 
 function createBaseRoomCreateRequest(): RoomCreateRequest {
@@ -305,26 +314,87 @@ export const RoomListRequest: MessageFns<RoomListRequest> = {
   },
 };
 
+function createBaseRoomId(): RoomId {
+  return { id: 0 };
+}
+
+export const RoomId: MessageFns<RoomId> = {
+  encode(message: RoomId, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== 0) {
+      writer.uint32(8).int32(message.id);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): RoomId {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoomId();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.id = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RoomId {
+    return { id: isSet(object.id) ? globalThis.Number(object.id) : 0 };
+  },
+
+  toJSON(message: RoomId): unknown {
+    const obj: any = {};
+    if (message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<RoomId>): RoomId {
+    return RoomId.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RoomId>): RoomId {
+    const message = createBaseRoomId();
+    message.id = object.id ?? 0;
+    return message;
+  },
+};
+
 function createBaseRoomResponse(): RoomResponse {
-  return { name: "", description: "", background: "", backgroundType: "", users: [] };
+  return { id: 0, name: "", description: "", background: "", backgroundType: "", users: [] };
 }
 
 export const RoomResponse: MessageFns<RoomResponse> = {
   encode(message: RoomResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== 0) {
+      writer.uint32(8).int32(message.id);
+    }
     if (message.name !== "") {
-      writer.uint32(10).string(message.name);
+      writer.uint32(18).string(message.name);
     }
     if (message.description !== "") {
-      writer.uint32(18).string(message.description);
+      writer.uint32(26).string(message.description);
     }
     if (message.background !== "") {
-      writer.uint32(26).string(message.background);
+      writer.uint32(34).string(message.background);
     }
     if (message.backgroundType !== "") {
-      writer.uint32(34).string(message.backgroundType);
+      writer.uint32(42).string(message.backgroundType);
     }
     for (const v of message.users) {
-      UserResponse.encode(v!, writer.uint32(42).fork()).join();
+      UserResponse.encode(v!, writer.uint32(50).fork()).join();
     }
     return writer;
   },
@@ -337,11 +407,11 @@ export const RoomResponse: MessageFns<RoomResponse> = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1: {
-          if (tag !== 10) {
+          if (tag !== 8) {
             break;
           }
 
-          message.name = reader.string();
+          message.id = reader.int32();
           continue;
         }
         case 2: {
@@ -349,7 +419,7 @@ export const RoomResponse: MessageFns<RoomResponse> = {
             break;
           }
 
-          message.description = reader.string();
+          message.name = reader.string();
           continue;
         }
         case 3: {
@@ -357,7 +427,7 @@ export const RoomResponse: MessageFns<RoomResponse> = {
             break;
           }
 
-          message.background = reader.string();
+          message.description = reader.string();
           continue;
         }
         case 4: {
@@ -365,11 +435,19 @@ export const RoomResponse: MessageFns<RoomResponse> = {
             break;
           }
 
-          message.backgroundType = reader.string();
+          message.background = reader.string();
           continue;
         }
         case 5: {
           if (tag !== 42) {
+            break;
+          }
+
+          message.backgroundType = reader.string();
+          continue;
+        }
+        case 6: {
+          if (tag !== 50) {
             break;
           }
 
@@ -387,6 +465,7 @@ export const RoomResponse: MessageFns<RoomResponse> = {
 
   fromJSON(object: any): RoomResponse {
     return {
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       description: isSet(object.description) ? globalThis.String(object.description) : "",
       background: isSet(object.background) ? globalThis.String(object.background) : "",
@@ -401,6 +480,9 @@ export const RoomResponse: MessageFns<RoomResponse> = {
 
   toJSON(message: RoomResponse): unknown {
     const obj: any = {};
+    if (message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
     if (message.name !== "") {
       obj.name = message.name;
     }
@@ -424,6 +506,7 @@ export const RoomResponse: MessageFns<RoomResponse> = {
   },
   fromPartial(object: DeepPartial<RoomResponse>): RoomResponse {
     const message = createBaseRoomResponse();
+    message.id = object.id ?? 0;
     message.name = object.name ?? "";
     message.description = object.description ?? "";
     message.background = object.background ?? "";
@@ -434,13 +517,22 @@ export const RoomResponse: MessageFns<RoomResponse> = {
 };
 
 function createBaseRoomListResponse(): RoomListResponse {
-  return { rooms: [] };
+  return { rooms: [], nextCursor: 0, prevCursor: 0, hasMore: false };
 }
 
 export const RoomListResponse: MessageFns<RoomListResponse> = {
   encode(message: RoomListResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     for (const v of message.rooms) {
       RoomResponse.encode(v!, writer.uint32(10).fork()).join();
+    }
+    if (message.nextCursor !== 0) {
+      writer.uint32(16).int32(message.nextCursor);
+    }
+    if (message.prevCursor !== 0) {
+      writer.uint32(24).int32(message.prevCursor);
+    }
+    if (message.hasMore !== false) {
+      writer.uint32(32).bool(message.hasMore);
     }
     return writer;
   },
@@ -460,6 +552,30 @@ export const RoomListResponse: MessageFns<RoomListResponse> = {
           message.rooms.push(RoomResponse.decode(reader, reader.uint32()));
           continue;
         }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.nextCursor = reader.int32();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.prevCursor = reader.int32();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.hasMore = reader.bool();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -472,6 +588,21 @@ export const RoomListResponse: MessageFns<RoomListResponse> = {
   fromJSON(object: any): RoomListResponse {
     return {
       rooms: globalThis.Array.isArray(object?.rooms) ? object.rooms.map((e: any) => RoomResponse.fromJSON(e)) : [],
+      nextCursor: isSet(object.nextCursor)
+        ? globalThis.Number(object.nextCursor)
+        : isSet(object.next_cursor)
+        ? globalThis.Number(object.next_cursor)
+        : 0,
+      prevCursor: isSet(object.prevCursor)
+        ? globalThis.Number(object.prevCursor)
+        : isSet(object.prev_cursor)
+        ? globalThis.Number(object.prev_cursor)
+        : 0,
+      hasMore: isSet(object.hasMore)
+        ? globalThis.Boolean(object.hasMore)
+        : isSet(object.has_more)
+        ? globalThis.Boolean(object.has_more)
+        : false,
     };
   },
 
@@ -479,6 +610,15 @@ export const RoomListResponse: MessageFns<RoomListResponse> = {
     const obj: any = {};
     if (message.rooms?.length) {
       obj.rooms = message.rooms.map((e) => RoomResponse.toJSON(e));
+    }
+    if (message.nextCursor !== 0) {
+      obj.nextCursor = Math.round(message.nextCursor);
+    }
+    if (message.prevCursor !== 0) {
+      obj.prevCursor = Math.round(message.prevCursor);
+    }
+    if (message.hasMore !== false) {
+      obj.hasMore = message.hasMore;
     }
     return obj;
   },
@@ -489,6 +629,9 @@ export const RoomListResponse: MessageFns<RoomListResponse> = {
   fromPartial(object: DeepPartial<RoomListResponse>): RoomListResponse {
     const message = createBaseRoomListResponse();
     message.rooms = object.rooms?.map((e) => RoomResponse.fromPartial(e)) || [];
+    message.nextCursor = object.nextCursor ?? 0;
+    message.prevCursor = object.prevCursor ?? 0;
+    message.hasMore = object.hasMore ?? false;
     return message;
   },
 };
@@ -504,6 +647,15 @@ export const RoomServiceService = {
     responseSerialize: (value: RoomResponse): Buffer => Buffer.from(RoomResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer): RoomResponse => RoomResponse.decode(value),
   },
+  getRoomByid: {
+    path: "/room.RoomService/GetRoomByid" as const,
+    requestStream: false as const,
+    responseStream: false as const,
+    requestSerialize: (value: RoomId): Buffer => Buffer.from(RoomId.encode(value).finish()),
+    requestDeserialize: (value: Buffer): RoomId => RoomId.decode(value),
+    responseSerialize: (value: RoomResponse): Buffer => Buffer.from(RoomResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): RoomResponse => RoomResponse.decode(value),
+  },
   getListRoom: {
     path: "/room.RoomService/GetListRoom" as const,
     requestStream: false as const,
@@ -513,11 +665,22 @@ export const RoomServiceService = {
     responseSerialize: (value: RoomListResponse): Buffer => Buffer.from(RoomListResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer): RoomListResponse => RoomListResponse.decode(value),
   },
+  deleteRoom: {
+    path: "/room.RoomService/DeleteRoom" as const,
+    requestStream: false as const,
+    responseStream: false as const,
+    requestSerialize: (value: RoomId): Buffer => Buffer.from(RoomId.encode(value).finish()),
+    requestDeserialize: (value: Buffer): RoomId => RoomId.decode(value),
+    responseSerialize: (value: Empty): Buffer => Buffer.from(Empty.encode(value).finish()),
+    responseDeserialize: (value: Buffer): Empty => Empty.decode(value),
+  },
 } as const;
 
 export interface RoomServiceServer extends UntypedServiceImplementation {
   createRoom: handleUnaryCall<RoomCreateRequest, RoomResponse>;
+  getRoomByid: handleUnaryCall<RoomId, RoomResponse>;
   getListRoom: handleUnaryCall<RoomListRequest, RoomListResponse>;
+  deleteRoom: handleUnaryCall<RoomId, Empty>;
 }
 
 export interface RoomServiceClient extends Client {
@@ -536,6 +699,18 @@ export interface RoomServiceClient extends Client {
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: RoomResponse) => void,
   ): ClientUnaryCall;
+  getRoomByid(request: RoomId, callback: (error: ServiceError | null, response: RoomResponse) => void): ClientUnaryCall;
+  getRoomByid(
+    request: RoomId,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: RoomResponse) => void,
+  ): ClientUnaryCall;
+  getRoomByid(
+    request: RoomId,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: RoomResponse) => void,
+  ): ClientUnaryCall;
   getListRoom(
     request: RoomListRequest,
     callback: (error: ServiceError | null, response: RoomListResponse) => void,
@@ -550,6 +725,18 @@ export interface RoomServiceClient extends Client {
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: RoomListResponse) => void,
+  ): ClientUnaryCall;
+  deleteRoom(request: RoomId, callback: (error: ServiceError | null, response: Empty) => void): ClientUnaryCall;
+  deleteRoom(
+    request: RoomId,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: Empty) => void,
+  ): ClientUnaryCall;
+  deleteRoom(
+    request: RoomId,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: Empty) => void,
   ): ClientUnaryCall;
 }
 
