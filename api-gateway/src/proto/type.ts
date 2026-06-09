@@ -25,6 +25,24 @@ export interface Room {
   backgroundType: string;
 }
 
+/**
+ * Shared response shapes — referenced by both user.proto and room.proto, so
+ * they live here to keep those two files from importing each other.
+ */
+export interface UserResponse {
+  id: number;
+  name: string;
+  username: string;
+}
+
+export interface RoomResponse {
+  id: number;
+  name: string;
+  description: string;
+  background: string;
+  backgroundType: string;
+}
+
 function createBaseUser(): User {
   return { id: 0, name: "", username: "", password: "", token: "" };
 }
@@ -268,6 +286,226 @@ export const Room: MessageFns<Room> = {
   },
   fromPartial(object: DeepPartial<Room>): Room {
     const message = createBaseRoom();
+    message.id = object.id ?? 0;
+    message.name = object.name ?? "";
+    message.description = object.description ?? "";
+    message.background = object.background ?? "";
+    message.backgroundType = object.backgroundType ?? "";
+    return message;
+  },
+};
+
+function createBaseUserResponse(): UserResponse {
+  return { id: 0, name: "", username: "" };
+}
+
+export const UserResponse: MessageFns<UserResponse> = {
+  encode(message: UserResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== 0) {
+      writer.uint32(8).int32(message.id);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.username !== "") {
+      writer.uint32(26).string(message.username);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UserResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUserResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.id = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.username = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UserResponse {
+    return {
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      username: isSet(object.username) ? globalThis.String(object.username) : "",
+    };
+  },
+
+  toJSON(message: UserResponse): unknown {
+    const obj: any = {};
+    if (message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.username !== "") {
+      obj.username = message.username;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UserResponse>): UserResponse {
+    return UserResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UserResponse>): UserResponse {
+    const message = createBaseUserResponse();
+    message.id = object.id ?? 0;
+    message.name = object.name ?? "";
+    message.username = object.username ?? "";
+    return message;
+  },
+};
+
+function createBaseRoomResponse(): RoomResponse {
+  return { id: 0, name: "", description: "", background: "", backgroundType: "" };
+}
+
+export const RoomResponse: MessageFns<RoomResponse> = {
+  encode(message: RoomResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.id !== 0) {
+      writer.uint32(8).int32(message.id);
+    }
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
+    }
+    if (message.description !== "") {
+      writer.uint32(26).string(message.description);
+    }
+    if (message.background !== "") {
+      writer.uint32(34).string(message.background);
+    }
+    if (message.backgroundType !== "") {
+      writer.uint32(42).string(message.backgroundType);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): RoomResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoomResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.id = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.name = reader.string();
+          continue;
+        }
+        case 3: {
+          if (tag !== 26) {
+            break;
+          }
+
+          message.description = reader.string();
+          continue;
+        }
+        case 4: {
+          if (tag !== 34) {
+            break;
+          }
+
+          message.background = reader.string();
+          continue;
+        }
+        case 5: {
+          if (tag !== 42) {
+            break;
+          }
+
+          message.backgroundType = reader.string();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RoomResponse {
+    return {
+      id: isSet(object.id) ? globalThis.Number(object.id) : 0,
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
+      description: isSet(object.description) ? globalThis.String(object.description) : "",
+      background: isSet(object.background) ? globalThis.String(object.background) : "",
+      backgroundType: isSet(object.backgroundType)
+        ? globalThis.String(object.backgroundType)
+        : isSet(object.background_type)
+        ? globalThis.String(object.background_type)
+        : "",
+    };
+  },
+
+  toJSON(message: RoomResponse): unknown {
+    const obj: any = {};
+    if (message.id !== 0) {
+      obj.id = Math.round(message.id);
+    }
+    if (message.name !== "") {
+      obj.name = message.name;
+    }
+    if (message.description !== "") {
+      obj.description = message.description;
+    }
+    if (message.background !== "") {
+      obj.background = message.background;
+    }
+    if (message.backgroundType !== "") {
+      obj.backgroundType = message.backgroundType;
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<RoomResponse>): RoomResponse {
+    return RoomResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<RoomResponse>): RoomResponse {
+    const message = createBaseRoomResponse();
     message.id = object.id ?? 0;
     message.name = object.name ?? "";
     message.description = object.description ?? "";

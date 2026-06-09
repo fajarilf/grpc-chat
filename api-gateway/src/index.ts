@@ -27,10 +27,6 @@ async function bootstrap() {
     layout: 'classic',
   }));
 
-  app.get('/', (_req, res) => {
-    res.json({ name: 'api-gateway', endpoints: ['/api/health', '/api/hello', '/api/echo', 'ws://.../ws'] });
-  });
-
   const server = http.createServer(app);
   attachWebSocket(server);
 
@@ -38,6 +34,7 @@ async function bootstrap() {
   server.listen(port, () => {
     console.log(`[api-gateway] http listening on http://localhost:${port}`);
     console.log(`[api-gateway] ws listening on ws://localhost:${port}/ws`);
+    console.log(`[api-gateway] docs can be accessed on http://localhost:${port}/docs`)
   });
 }
 

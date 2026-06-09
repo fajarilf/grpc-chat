@@ -4,7 +4,8 @@ import {
     RoomListRequest, 
     RoomListResponse,
     RoomCreateRequest,
-    RoomResponse
+    RoomResponseWithUser,
+    RoomId
 } from "../proto/room";
 
 const roomClient = new RoomServiceClient(
@@ -18,8 +19,14 @@ export function getListRoom(param: RoomListRequest): Promise<RoomListResponse> {
     });
 }
 
-export function createRoom(param: RoomCreateRequest): Promise<RoomResponse> {
+export function createRoom(param: RoomCreateRequest): Promise<RoomResponseWithUser> {
     return new Promise((resolve, reject) => {
         roomClient.createRoom(param, (err, res) => (err ? reject(err) : resolve(res)))
+    })
+}
+
+export function getRoomById(param: RoomId): Promise<RoomResponseWithUser> {
+    return new Promise((resolve, reject) => {
+        roomClient.getRoomById(param, (err, res) => (err ? reject(err) : resolve(res)))
     })
 }

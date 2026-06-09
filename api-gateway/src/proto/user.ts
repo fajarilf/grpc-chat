@@ -18,7 +18,7 @@ import {
   type ServiceError,
   type UntypedServiceImplementation,
 } from "@grpc/grpc-js";
-import { Room } from "./type";
+import { RoomResponse, UserResponse } from "./type";
 
 export const protobufPackage = "user";
 
@@ -38,11 +38,11 @@ export interface UserLoginResponse {
   token: string;
 }
 
-export interface UserResponse {
+export interface UserResponseWithRoom {
   id: number;
   name: string;
   username: string;
-  rooms: Room[];
+  rooms: RoomResponse[];
 }
 
 function createBaseUserCreateRequest(): UserCreateRequest {
@@ -289,12 +289,12 @@ export const UserLoginResponse: MessageFns<UserLoginResponse> = {
   },
 };
 
-function createBaseUserResponse(): UserResponse {
+function createBaseUserResponseWithRoom(): UserResponseWithRoom {
   return { id: 0, name: "", username: "", rooms: [] };
 }
 
-export const UserResponse: MessageFns<UserResponse> = {
-  encode(message: UserResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const UserResponseWithRoom: MessageFns<UserResponseWithRoom> = {
+  encode(message: UserResponseWithRoom, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.id !== 0) {
       writer.uint32(8).int32(message.id);
     }
@@ -305,15 +305,15 @@ export const UserResponse: MessageFns<UserResponse> = {
       writer.uint32(26).string(message.username);
     }
     for (const v of message.rooms) {
-      Room.encode(v!, writer.uint32(34).fork()).join();
+      RoomResponse.encode(v!, writer.uint32(34).fork()).join();
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): UserResponse {
+  decode(input: BinaryReader | Uint8Array, length?: number): UserResponseWithRoom {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseUserResponse();
+    const message = createBaseUserResponseWithRoom();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -346,7 +346,7 @@ export const UserResponse: MessageFns<UserResponse> = {
             break;
           }
 
-          message.rooms.push(Room.decode(reader, reader.uint32()));
+          message.rooms.push(RoomResponse.decode(reader, reader.uint32()));
           continue;
         }
       }
@@ -358,16 +358,16 @@ export const UserResponse: MessageFns<UserResponse> = {
     return message;
   },
 
-  fromJSON(object: any): UserResponse {
+  fromJSON(object: any): UserResponseWithRoom {
     return {
       id: isSet(object.id) ? globalThis.Number(object.id) : 0,
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       username: isSet(object.username) ? globalThis.String(object.username) : "",
-      rooms: globalThis.Array.isArray(object?.rooms) ? object.rooms.map((e: any) => Room.fromJSON(e)) : [],
+      rooms: globalThis.Array.isArray(object?.rooms) ? object.rooms.map((e: any) => RoomResponse.fromJSON(e)) : [],
     };
   },
 
-  toJSON(message: UserResponse): unknown {
+  toJSON(message: UserResponseWithRoom): unknown {
     const obj: any = {};
     if (message.id !== 0) {
       obj.id = Math.round(message.id);
@@ -379,20 +379,20 @@ export const UserResponse: MessageFns<UserResponse> = {
       obj.username = message.username;
     }
     if (message.rooms?.length) {
-      obj.rooms = message.rooms.map((e) => Room.toJSON(e));
+      obj.rooms = message.rooms.map((e) => RoomResponse.toJSON(e));
     }
     return obj;
   },
 
-  create(base?: DeepPartial<UserResponse>): UserResponse {
-    return UserResponse.fromPartial(base ?? {});
+  create(base?: DeepPartial<UserResponseWithRoom>): UserResponseWithRoom {
+    return UserResponseWithRoom.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<UserResponse>): UserResponse {
-    const message = createBaseUserResponse();
+  fromPartial(object: DeepPartial<UserResponseWithRoom>): UserResponseWithRoom {
+    const message = createBaseUserResponseWithRoom();
     message.id = object.id ?? 0;
     message.name = object.name ?? "";
     message.username = object.username ?? "";
-    message.rooms = object.rooms?.map((e) => Room.fromPartial(e)) || [];
+    message.rooms = object.rooms?.map((e) => RoomResponse.fromPartial(e)) || [];
     return message;
   },
 };
