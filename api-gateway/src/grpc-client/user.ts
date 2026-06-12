@@ -4,8 +4,10 @@ import {
     UserLoginRequest,
     UserLoginResponse,
     UserCreateRequest,
-    UserResponse
+    UserListResponse,
 } from "../proto/user"
+import { UserResponse } from "../proto/type"
+import { Empty } from "../proto/google/protobuf/empty"
 
 const userClient = new UserServiceClient(
     process.env.GRPC_SERVER_ADDR ?? "localhost:50051",
@@ -21,5 +23,11 @@ export function register(param: UserCreateRequest): Promise<UserResponse> {
 export function login(param: UserLoginRequest): Promise<UserLoginResponse> {
     return new Promise((resolve, reject) => {
         userClient.login(param, (err, res) => (err ? reject(err) : resolve(res)))
+    })
+}
+
+export function getList(empty: Empty): Promise<UserListResponse> {
+    return new Promise((resolve, reject) => {
+        userClient.getList(empty, (err, res) => (err ? reject(err) : resolve(res)))
     })
 }
