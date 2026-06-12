@@ -7,32 +7,47 @@ import (
 	pb "github.com/fajarilf/grpc-chat-proto/proto"
 	"github.com/fajarilf/grpc-chat-server/models"
 	"github.com/fajarilf/grpc-chat-server/repositories"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type RoomService struct {
+	pool         *pgxpool.Pool
 	repo         *repositories.RoomRepository
 	userRoomRepo *repositories.UserRoomRepository
 }
 
-func NewRoomService(repo *repositories.RoomRepository, userRoomRepo *repositories.UserRoomRepository) *RoomService {
+func NewRoomService(pool *pgxpool.Pool, repo *repositories.RoomRepository, userRoomRepo *repositories.UserRoomRepository) *RoomService {
 	return &RoomService{
+		pool:         pool,
 		repo:         repo,
 		userRoomRepo: userRoomRepo,
 	}
 }
 
 func (rs *RoomService) CreateRoom(ctx context.Context, param *pb.RoomCreateRequest) (*pb.RoomResponseWithUser, error) {
-	result, err := rs.repo.Create(ctx, param)
-	if err != nil {
-		return nil, fmt.Errorf("Create Room Error: %v", err)
-	}
-
 	userIDs := make([]int, len(param.UserIds))
 	for i, id := range param.UserIds {
 		userIDs[i] = int(id)
 	}
 
-	if err := rs.userRoomRepo.CreateBatch(ctx, result.Id, userIDs); err != nil {
+	// Room insert and membership insert must commit together, so run both on a
+	// single transaction. The deferred Rollback is a no-op once Commit succeeds.
+	tx, err := rs.pool.Begin(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("Create Room Error: %v", err)
+	}
+	defer tx.Rollback(ctx)
+
+	result, err := rs.repo.Create(ctx, tx, param)
+	if err != nil {
+		return nil, fmt.Errorf("Create Room Error: %v", err)
+	}
+
+	if err := rs.userRoomRepo.CreateBatch(ctx, tx, result.Id, userIDs); err != nil {
+		return nil, fmt.Errorf("Create Room Error: %v", err)
+	}
+
+	if err := tx.Commit(ctx); err != nil {
 		return nil, fmt.Errorf("Create Room Error: %v", err)
 	}
 

@@ -39,7 +39,7 @@ func main() {
 	userRoomRepo := repositories.NewUserRoomRepository(pool)
 
 	// register grpc server
-	roomServer := server.NewRoomServer(roomRepo, userRoomRepo)
+	roomServer := server.NewRoomServer(pool, roomRepo, userRoomRepo)
 	pb.RegisterRoomServiceServer(grpcServer, roomServer)
 
 	userServer := server.NewUserServer(userRepo)

@@ -23,12 +23,12 @@ func NewUserRoomRepository(pool *pgxpool.Pool) *UserRoomRepository {
 // round trip. Postgres expands the int[] via unnest into one row each, pairing
 // every user_id with the constant room_id. ON CONFLICT DO NOTHING makes it
 // idempotent so re-adding an existing member is a no-op instead of a PK error.
-func (r *UserRoomRepository) CreateBatch(ctx context.Context, roomID int, userIDs []int) error {
+func (r *UserRoomRepository) CreateBatch(ctx context.Context, db DBTX, roomID int, userIDs []int) error {
 	if len(userIDs) == 0 {
 		return nil
 	}
 
-	_, err := r.pool.Exec(ctx,
+	_, err := db.Exec(ctx,
 		`INSERT INTO room_users (room_id, user_id)
 		 SELECT $1, unnest($2::int[])
 		 ON CONFLICT DO NOTHING`,
@@ -46,12 +46,12 @@ func (r *UserRoomRepository) GetList(ctx context.Context) ([]*models.UserRoom, e
 		`SELECT user_id, room_id FROM room_users`,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("UserRoomRepo Error: %v", rows)
+		return nil, fmt.Errorf("UserRoomRepo Error: %v", err)
 	}
 
 	userRoom, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[models.UserRoom])
 	if err != nil {
-		return nil, fmt.Errorf("UserRoomRepo Error: %v", rows)
+		return nil, fmt.Errorf("UserRoomRepo Error: %v", err)
 	}
 
 	return userRoom, err

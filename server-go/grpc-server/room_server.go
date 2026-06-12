@@ -6,6 +6,7 @@ import (
 	pb "github.com/fajarilf/grpc-chat-proto/proto"
 	"github.com/fajarilf/grpc-chat-server/repositories"
 	"github.com/fajarilf/grpc-chat-server/services"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // RoomServer adapts the gRPC RoomServiceServer interface onto the plain
@@ -17,8 +18,8 @@ type RoomServer struct {
 	service *services.RoomService
 }
 
-func NewRoomServer(repo *repositories.RoomRepository, userRoomRepo *repositories.UserRoomRepository) *RoomServer {
-	return &RoomServer{service: services.NewRoomService(repo, userRoomRepo)}
+func NewRoomServer(pool *pgxpool.Pool, repo *repositories.RoomRepository, userRoomRepo *repositories.UserRoomRepository) *RoomServer {
+	return &RoomServer{service: services.NewRoomService(pool, repo, userRoomRepo)}
 }
 
 func (s *RoomServer) CreateRoom(ctx context.Context, req *pb.RoomCreateRequest) (*pb.RoomResponseWithUser, error) {

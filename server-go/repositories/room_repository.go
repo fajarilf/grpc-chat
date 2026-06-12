@@ -20,8 +20,10 @@ func NewRoomRepository(pool *pgxpool.Pool) *RoomRepository {
 	}
 }
 
-func (r *RoomRepository) Create(ctx context.Context, param *pb.RoomCreateRequest) (*models.Room, error) {
-	rows, err := r.pool.Query(ctx,
+// Create inserts a room using the given executor, which may be the pool or a
+// transaction so the caller can compose it with the membership insert atomically.
+func (r *RoomRepository) Create(ctx context.Context, db DBTX, param *pb.RoomCreateRequest) (*models.Room, error) {
+	rows, err := db.Query(ctx,
 		`INSERT INTO rooms (name, description, background, background_type)
 		 VALUES ($1, $2, $3, $4)
 		 RETURNING *`,
