@@ -30,7 +30,7 @@ func (us *UserService) Login(param *pb.UserLoginRequest) (*pb.UserLoginResponse,
 func (us *UserService) GetList(ctx context.Context) (*pb.UserListResponse, error) {
 	result, err := us.repo.Get(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("User Get List Error: %v", result)
+		return nil, fmt.Errorf("User Get List Error: %v", err)
 	}
 
 	responses := []*pb.UserResponse{}

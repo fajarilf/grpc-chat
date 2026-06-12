@@ -11,7 +11,7 @@ export class UserController {
         next: NextFunction
     ) {
         try {
-            const result = await userClient.getList(Empty.create);
+            const result = await userClient.getList(Empty.create());
             return res.status(200).json({
                 status: "success",
                 data: result.users
