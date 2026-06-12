@@ -17,18 +17,18 @@ type RoomServer struct {
 	service *services.RoomService
 }
 
-func NewRoomServer(repo *repositories.RoomRepository) *RoomServer {
-	return &RoomServer{service: services.NewRoomService(repo)}
+func NewRoomServer(repo *repositories.RoomRepository, userRoomRepo *repositories.UserRoomRepository) *RoomServer {
+	return &RoomServer{service: services.NewRoomService(repo, userRoomRepo)}
 }
 
 func (s *RoomServer) CreateRoom(ctx context.Context, req *pb.RoomCreateRequest) (*pb.RoomResponseWithUser, error) {
-	return s.service.CreateRoom(ctx, req), nil
+	return s.service.CreateRoom(ctx, req)
 }
 
 func (s *RoomServer) GetListRoom(ctx context.Context, req *pb.RoomListRequest) (*pb.RoomListResponse, error) {
-	return s.service.GetListRoom(ctx, req), nil
+	return s.service.GetListRoom(ctx, req)
 }
 
 func (s *RoomServer) GetRoomById(ctx context.Context, req *pb.RoomId) (*pb.RoomResponseWithUser, error) {
-	return s.service.GetRoomById(ctx, req), nil
+	return s.service.GetRoomById(ctx, req)
 }

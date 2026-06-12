@@ -35,12 +35,14 @@ func main() {
 
 	// repository
 	roomRepo := repositories.NewRoomRepository(pool)
+	userRepo := repositories.NewUserRepository(pool)
+	userRoomRepo := repositories.NewUserRoomRepository(pool)
 
 	// register grpc server
-	roomServer := server.NewRoomServer(roomRepo)
+	roomServer := server.NewRoomServer(roomRepo, userRoomRepo)
 	pb.RegisterRoomServiceServer(grpcServer, roomServer)
 
-	userServer := server.NewUserServer()
+	userServer := server.NewUserServer(userRepo)
 	pb.RegisterUserServiceServer(grpcServer, userServer)
 
 	log.Println("Chat server started on :50051")
