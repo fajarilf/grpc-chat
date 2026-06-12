@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "type.proto";
+import "google/protobuf/empty.proto";
 
 package user;
 
@@ -29,7 +30,12 @@ message UserResponseWithRoom {
     repeated type.RoomResponse rooms = 4;
 }
 
+message UserListResponse {
+    repeated type.UserResponse users = 1;
+}
+
 service UserService {
     rpc Register(UserCreateRequest) returns (type.UserResponse);
     rpc Login(UserLoginRequest) returns (UserLoginResponse);
+    rpc GetList(google.protobuf.Empty) returns (UserListResponse);
 }
