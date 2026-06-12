@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/fajarilf/grpc-chat-server/utils"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -16,7 +17,7 @@ func Connect(ctx context.Context) (*pgxpool.Pool, error) {
 
 	config, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
-		return nil, fmt.Errorf("Parse confing error: %w", err)
+		return nil, utils.WrapError("Parse config error", err)
 	}
 
 	config.MaxConns = 25
@@ -26,12 +27,12 @@ func Connect(ctx context.Context) (*pgxpool.Pool, error) {
 
 	pool, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {
-		return nil, fmt.Errorf("Create pool error: %w", err)
+		return nil, utils.WrapError("Create pool error", err)
 	}
 
 	if err := pool.Ping(ctx); err != nil {
 		pool.Close()
-		return nil, fmt.Errorf("Ping database error: %w", err)
+		return nil, utils.WrapError("Ping database error", err)
 	}
 
 	return pool, nil

@@ -2,11 +2,12 @@ package services
 
 import (
 	"context"
-	"fmt"
 
 	pb "github.com/fajarilf/grpc-chat-proto/proto"
 	"github.com/fajarilf/grpc-chat-server/models"
 	"github.com/fajarilf/grpc-chat-server/repositories"
+	"github.com/fajarilf/grpc-chat-server/utils"
+	"google.golang.org/grpc/codes"
 )
 
 type UserService struct {
@@ -30,10 +31,10 @@ func (us *UserService) Login(param *pb.UserLoginRequest) (*pb.UserLoginResponse,
 func (us *UserService) GetList(ctx context.Context) (*pb.UserListResponse, error) {
 	result, err := us.repo.Get(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("User Get List Error: %v", err)
+		return nil, utils.WrapGRPCError(codes.Internal, "User Get List Error", err)
 	}
 
-	responses := []*pb.UserResponse{}
+	responses := make([]*pb.UserResponse, 0, len(result))
 	for _, val := range result {
 		responses = append(responses, models.ToUserResponse(val))
 	}

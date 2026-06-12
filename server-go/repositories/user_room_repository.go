@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/fajarilf/grpc-chat-server/models"
 	"github.com/jackc/pgx/v5"
@@ -35,7 +34,7 @@ func (r *UserRoomRepository) CreateBatch(ctx context.Context, db DBTX, roomID in
 		roomID, userIDs,
 	)
 	if err != nil {
-		return fmt.Errorf("UserRoomRepo CreateBatch Error: %v", err)
+		return err
 	}
 
 	return nil
@@ -46,12 +45,12 @@ func (r *UserRoomRepository) GetList(ctx context.Context) ([]*models.UserRoom, e
 		`SELECT user_id, room_id FROM room_users`,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("UserRoomRepo Error: %v", err)
+		return nil, err
 	}
 
 	userRoom, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[models.UserRoom])
 	if err != nil {
-		return nil, fmt.Errorf("UserRoomRepo Error: %v", err)
+		return nil, err
 	}
 
 	return userRoom, err

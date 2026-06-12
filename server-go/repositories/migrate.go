@@ -2,11 +2,12 @@ package repositories
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/fajarilf/grpc-chat-server/migrations"
+	"github.com/fajarilf/grpc-chat-server/utils"
 	"github.com/golang-migrate/migrate/v4"
+
 	// Registers the "pgx5" database URL scheme for golang-migrate.
 	_ "github.com/golang-migrate/migrate/v4/database/pgx/v5"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
@@ -21,12 +22,12 @@ import (
 func NewMigrator(dbURL string) (*migrate.Migrate, error) {
 	src, err := iofs.New(migrations.Files, ".")
 	if err != nil {
-		return nil, fmt.Errorf("load embedded migrations: %w", err)
+		return nil, utils.WrapError("load embedded migrations", err)
 	}
 
 	m, err := migrate.NewWithSourceInstance("iofs", src, toPgxURL(dbURL))
 	if err != nil {
-		return nil, fmt.Errorf("init migrator: %w", err)
+		return nil, utils.WrapError("init migrator", err)
 	}
 	return m, nil
 }
@@ -41,7 +42,7 @@ func Migrate(dbURL string) error {
 	defer m.Close()
 
 	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
-		return fmt.Errorf("apply migrations: %w", err)
+		return utils.WrapError("apply migrations", err)
 	}
 	return nil
 }
