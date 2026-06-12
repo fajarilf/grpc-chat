@@ -7,11 +7,15 @@ servers:
 tags:
   - name: Rooms
     description: Room listing and creation
+  - name: Users
+    description: Users listing and creation
 paths:
   /rooms:
     $ref: "./room-docs.yaml#/rooms"
   /rooms/{roomId}:
     $ref: "./room-docs.yaml#/rooms-by-id"
+  /users:
+    $ref: "./user-docs.yaml#/users"
 components:
   schemas:
     RoomResponse:

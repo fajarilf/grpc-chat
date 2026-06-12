@@ -1,0 +1,21 @@
+users:
+  get:
+    tags:
+      - Users
+    summary: Get All Users
+    description: Returns list of registered users.
+    responses:
+      "200":
+        description: List of Users
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: success
+                data:
+                  type: array
+                  items:
+                    $ref: "./main-docs.yaml#/components/schemas/UserResponse"
