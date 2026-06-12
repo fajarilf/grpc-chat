@@ -9,6 +9,7 @@ package proto_go
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -253,13 +254,57 @@ func (x *UserResponseWithRoom) GetRooms() []*RoomResponse {
 	return nil
 }
 
+type UserListResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Users         []*UserResponse        `protobuf:"bytes,1,rep,name=users,proto3" json:"users,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserListResponse) Reset() {
+	*x = UserListResponse{}
+	mi := &file_user_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserListResponse) ProtoMessage() {}
+
+func (x *UserListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserListResponse.ProtoReflect.Descriptor instead.
+func (*UserListResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *UserListResponse) GetUsers() []*UserResponse {
+	if x != nil {
+		return x.Users
+	}
+	return nil
+}
+
 var File_user_proto protoreflect.FileDescriptor
 
 const file_user_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
 	"user.proto\x12\x04user\x1a\n" +
-	"type.proto\"_\n" +
+	"type.proto\x1a\x1bgoogle/protobuf/empty.proto\"_\n" +
 	"\x11UserCreateRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x1a\n" +
@@ -274,10 +319,13 @@ const file_user_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
 	"\busername\x18\x03 \x01(\tR\busername\x12(\n" +
-	"\x05rooms\x18\x04 \x03(\v2\x12.type.RoomResponseR\x05rooms2\x80\x01\n" +
+	"\x05rooms\x18\x04 \x03(\v2\x12.type.RoomResponseR\x05rooms\"<\n" +
+	"\x10UserListResponse\x12(\n" +
+	"\x05users\x18\x01 \x03(\v2\x12.type.UserResponseR\x05users2\xbb\x01\n" +
 	"\vUserService\x127\n" +
 	"\bRegister\x12\x17.user.UserCreateRequest\x1a\x12.type.UserResponse\x128\n" +
-	"\x05Login\x12\x16.user.UserLoginRequest\x1a\x17.user.UserLoginResponseB(Z&github.com/fajarilf/grpc-chat/proto-gob\x06proto3"
+	"\x05Login\x12\x16.user.UserLoginRequest\x1a\x17.user.UserLoginResponse\x129\n" +
+	"\aGetList\x12\x16.google.protobuf.Empty\x1a\x16.user.UserListResponseB(Z&github.com/fajarilf/grpc-chat/proto-gob\x06proto3"
 
 var (
 	file_user_proto_rawDescOnce sync.Once
@@ -291,26 +339,31 @@ func file_user_proto_rawDescGZIP() []byte {
 	return file_user_proto_rawDescData
 }
 
-var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_user_proto_goTypes = []any{
 	(*UserCreateRequest)(nil),    // 0: user.UserCreateRequest
 	(*UserLoginRequest)(nil),     // 1: user.UserLoginRequest
 	(*UserLoginResponse)(nil),    // 2: user.UserLoginResponse
 	(*UserResponseWithRoom)(nil), // 3: user.UserResponseWithRoom
-	(*RoomResponse)(nil),         // 4: type.RoomResponse
-	(*UserResponse)(nil),         // 5: type.UserResponse
+	(*UserListResponse)(nil),     // 4: user.UserListResponse
+	(*RoomResponse)(nil),         // 5: type.RoomResponse
+	(*UserResponse)(nil),         // 6: type.UserResponse
+	(*emptypb.Empty)(nil),        // 7: google.protobuf.Empty
 }
 var file_user_proto_depIdxs = []int32{
-	4, // 0: user.UserResponseWithRoom.rooms:type_name -> type.RoomResponse
-	0, // 1: user.UserService.Register:input_type -> user.UserCreateRequest
-	1, // 2: user.UserService.Login:input_type -> user.UserLoginRequest
-	5, // 3: user.UserService.Register:output_type -> type.UserResponse
-	2, // 4: user.UserService.Login:output_type -> user.UserLoginResponse
-	3, // [3:5] is the sub-list for method output_type
-	1, // [1:3] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	5, // 0: user.UserResponseWithRoom.rooms:type_name -> type.RoomResponse
+	6, // 1: user.UserListResponse.users:type_name -> type.UserResponse
+	0, // 2: user.UserService.Register:input_type -> user.UserCreateRequest
+	1, // 3: user.UserService.Login:input_type -> user.UserLoginRequest
+	7, // 4: user.UserService.GetList:input_type -> google.protobuf.Empty
+	6, // 5: user.UserService.Register:output_type -> type.UserResponse
+	2, // 6: user.UserService.Login:output_type -> user.UserLoginResponse
+	4, // 7: user.UserService.GetList:output_type -> user.UserListResponse
+	5, // [5:8] is the sub-list for method output_type
+	2, // [2:5] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_user_proto_init() }
@@ -325,7 +378,7 @@ func file_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_proto_rawDesc), len(file_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

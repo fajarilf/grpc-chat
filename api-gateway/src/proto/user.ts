@@ -18,6 +18,7 @@ import {
   type ServiceError,
   type UntypedServiceImplementation,
 } from "@grpc/grpc-js";
+import { Empty } from "./google/protobuf/empty";
 import { RoomResponse, UserResponse } from "./type";
 
 export const protobufPackage = "user";
@@ -43,6 +44,10 @@ export interface UserResponseWithRoom {
   name: string;
   username: string;
   rooms: RoomResponse[];
+}
+
+export interface UserListResponse {
+  users: UserResponse[];
 }
 
 function createBaseUserCreateRequest(): UserCreateRequest {
@@ -397,6 +402,66 @@ export const UserResponseWithRoom: MessageFns<UserResponseWithRoom> = {
   },
 };
 
+function createBaseUserListResponse(): UserListResponse {
+  return { users: [] };
+}
+
+export const UserListResponse: MessageFns<UserListResponse> = {
+  encode(message: UserListResponse, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.users) {
+      UserResponse.encode(v!, writer.uint32(10).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): UserListResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseUserListResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.users.push(UserResponse.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): UserListResponse {
+    return {
+      users: globalThis.Array.isArray(object?.users) ? object.users.map((e: any) => UserResponse.fromJSON(e)) : [],
+    };
+  },
+
+  toJSON(message: UserListResponse): unknown {
+    const obj: any = {};
+    if (message.users?.length) {
+      obj.users = message.users.map((e) => UserResponse.toJSON(e));
+    }
+    return obj;
+  },
+
+  create(base?: DeepPartial<UserListResponse>): UserListResponse {
+    return UserListResponse.fromPartial(base ?? {});
+  },
+  fromPartial(object: DeepPartial<UserListResponse>): UserListResponse {
+    const message = createBaseUserListResponse();
+    message.users = object.users?.map((e) => UserResponse.fromPartial(e)) || [];
+    return message;
+  },
+};
+
 export type UserServiceService = typeof UserServiceService;
 export const UserServiceService = {
   register: {
@@ -417,11 +482,21 @@ export const UserServiceService = {
     responseSerialize: (value: UserLoginResponse): Buffer => Buffer.from(UserLoginResponse.encode(value).finish()),
     responseDeserialize: (value: Buffer): UserLoginResponse => UserLoginResponse.decode(value),
   },
+  getList: {
+    path: "/user.UserService/GetList" as const,
+    requestStream: false as const,
+    responseStream: false as const,
+    requestSerialize: (value: Empty): Buffer => Buffer.from(Empty.encode(value).finish()),
+    requestDeserialize: (value: Buffer): Empty => Empty.decode(value),
+    responseSerialize: (value: UserListResponse): Buffer => Buffer.from(UserListResponse.encode(value).finish()),
+    responseDeserialize: (value: Buffer): UserListResponse => UserListResponse.decode(value),
+  },
 } as const;
 
 export interface UserServiceServer extends UntypedServiceImplementation {
   register: handleUnaryCall<UserCreateRequest, UserResponse>;
   login: handleUnaryCall<UserLoginRequest, UserLoginResponse>;
+  getList: handleUnaryCall<Empty, UserListResponse>;
 }
 
 export interface UserServiceClient extends Client {
@@ -454,6 +529,18 @@ export interface UserServiceClient extends Client {
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: UserLoginResponse) => void,
+  ): ClientUnaryCall;
+  getList(request: Empty, callback: (error: ServiceError | null, response: UserListResponse) => void): ClientUnaryCall;
+  getList(
+    request: Empty,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: UserListResponse) => void,
+  ): ClientUnaryCall;
+  getList(
+    request: Empty,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: UserListResponse) => void,
   ): ClientUnaryCall;
 }
 
