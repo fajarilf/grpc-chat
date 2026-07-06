@@ -12,30 +12,30 @@ function getRandomRooms(array: Room[], count: number = 2): Room[] {
 }
 
 const seedRooms: Room[] = [
-  {
-    id: makeId(),
-    number: 101,
-    description: "General engineering chat",
-    memberIds: [currentUserId, "u1", "u3", "u8"],
-    background: { kind: "color", value: presetColors[1].value },
-    createdAt: new Date(),
-  },
-  {
-    id: makeId(),
-    number: 202,
-    description: "Production line monitoring",
-    memberIds: [currentUserId, "u2", "u5"],
-    background: { kind: "image", src: presetImages[1].src },
-    createdAt: new Date(),
-  },
-  {
-    id: makeId(),
-    number: 303,
-    description: "Off-topic lounge",
-    memberIds: [currentUserId, "u4", "u7", "u1", "u3"],
-    background: { kind: "color", value: presetColors[5].value },
-    createdAt: new Date(),
-  },
+  // {
+  //   id: makeId(),
+  //   number: 101,
+  //   description: "General engineering chat",
+  //   memberIds: [currentUserId, "u1", "u3", "u8"],
+  //   background: { kind: "color", value: presetColors[1].value },
+  //   createdAt: new Date(),
+  // },
+  // {
+  //   id: makeId(),
+  //   number: 202,
+  //   description: "Production line monitoring",
+  //   memberIds: [currentUserId, "u2", "u5"],
+  //   background: { kind: "image", src: presetImages[1].src },
+  //   createdAt: new Date(),
+  // },
+  // {
+  //   id: makeId(),
+  //   number: 303,
+  //   description: "Off-topic lounge",
+  //   memberIds: [currentUserId, "u4", "u7", "u1", "u3"],
+  //   background: { kind: "color", value: presetColors[5].value },
+  //   createdAt: new Date(),
+  // },
 ];
 
 const currentRoom: Room[] = getRandomRooms(seedRooms);
@@ -49,20 +49,20 @@ type roomExportType = {
 
 export const roomStore = $state<roomExportType>({ rooms: seedRooms, currentRoom, favRoom });
 
-export function createRoom(input: {
-  number: number;
-  description: string;
-  memberIds: string[];
-  background: RoomBackground;
-}): Room {
-  const room: Room = {
-    id: makeId(),
-    number: input.number,
-    description: input.description,
-    memberIds: Array.from(new Set([currentUserId, ...input.memberIds])),
-    background: input.background,
-    createdAt: new Date(),
-  };
-  roomStore.rooms = [...roomStore.rooms, room];
-  return room;
-}
+// export function createRoom(input: {
+//   number: number;
+//   description: string;
+//   memberIds: string[];
+//   background: RoomBackground;
+// }): Room {
+//   const room: Room = {
+//     id: makeId(),
+//     number: input.number,
+//     description: input.description,
+//     memberIds: Array.from(new Set([currentUserId, ...input.memberIds])),
+//     background: input.background,
+//     createdAt: new Date(),
+//   };
+//   roomStore.rooms = [...roomStore.rooms, room];
+//   return room;
+// }

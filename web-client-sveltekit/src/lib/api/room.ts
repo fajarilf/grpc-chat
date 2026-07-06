@@ -1,5 +1,6 @@
 import type { ListFilter, SuccessResponse } from "$lib/types/api";
-import type { CreateRoomInput, Room, RoomBackground } from "$lib/types/room";
+import type { CreateRoomInput, Room } from "$lib/types/room";
+import { backgroundTypeToNumber } from "$lib/types/room";
 
 const BASE = import.meta.env.VITE_API_BASE;
 
@@ -19,7 +20,10 @@ export async function createRoom(input: CreateRoomInput, fetchFn = fetch): Promi
     const res = await fetchFn(`${BASE}/rooms`, {
         method: "POST",
         headers: {"content-type": "application/json"},
-        body: JSON.stringify(input),
+        body: JSON.stringify({
+            ...input,
+            backgroundType: backgroundTypeToNumber[input.backgroundType],
+        }),
     });
 
     if (!res.ok) throw new Error(`createRoom ${res.status}`);

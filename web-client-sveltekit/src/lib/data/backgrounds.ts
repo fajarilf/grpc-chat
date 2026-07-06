@@ -1,4 +1,4 @@
-import type { RoomBackground } from "$lib/types/room";
+import { BackgroundType, type RoomBackground } from "$lib/types/room";
 
 export const presetColors: { label: string; value: string }[] = [
   { label: "Slate", value: "#475569" },
@@ -21,6 +21,6 @@ export const presetImages: { label: string; src: string }[] = [
 ];
 
 export const defaultBackground: RoomBackground = {
-  kind: "color",
+  kind: BackgroundType.COLOR,
   value: presetColors[0].value,
 };

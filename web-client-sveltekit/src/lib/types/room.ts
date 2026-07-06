@@ -1,8 +1,19 @@
 import type { User } from "./user";
 
-export type RoomBackground =
-  | { kind: "color"; value: string }
-  | { kind: "image"; src: string };
+export enum BackgroundType {
+  COLOR = "COLOR",
+  IMAGE = "IMAGE"
+}
+
+export const backgroundTypeToNumber: Record<BackgroundType, number> = {
+  [BackgroundType.COLOR]: 0,
+  [BackgroundType.IMAGE]: 1,
+};
+
+export type RoomBackground = {
+  kind: BackgroundType
+  value: string;
+}
 
 export type Room = {
   id: string;
@@ -10,13 +21,14 @@ export type Room = {
   description: string;
   users: User[];
   background: string;
-  backgroundType: "COLOR" | "IMAGE"
+  backgroundType: string
   createdAt: Date;
 };
 
 export type CreateRoomInput = {
-    number: number,
-    description: string,
-    memberIds: string[],
-    background: RoomBackground
+  name: string,
+  description: string,
+  backgroundType: BackgroundType
+  background: string
+  user_ids: number[],
 }
