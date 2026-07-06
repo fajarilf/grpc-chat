@@ -2,26 +2,26 @@
   import { Check } from "@lucide/svelte";
   import { cn } from "$lib/utils";
   import { presetColors, presetImages } from "$lib/data/backgrounds";
-  import type { RoomBackground } from "$lib/types/room";
+  import { BackgroundType, type RoomBackground } from "$lib/types/room";
 
   let {
     value = $bindable(),
   }: { value: RoomBackground } = $props();
 
   function selectColor(c: string) {
-    value = { kind: "color", value: c };
+    value = { kind: BackgroundType.COLOR, value: c };
   }
 
   function selectImage(src: string) {
-    value = { kind: "image", src };
+    value = { kind: BackgroundType.IMAGE, value: src };
   }
 
   function isSelectedColor(c: string) {
-    return value.kind === "color" && value.value === c;
+    return value.kind === BackgroundType.COLOR && value.value === c;
   }
 
   function isSelectedImage(src: string) {
-    return value.kind === "image" && value.src === src;
+    return value.kind === BackgroundType.IMAGE && value.value === src;
   }
 </script>
 

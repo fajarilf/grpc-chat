@@ -5,42 +5,48 @@
   import Input from "$lib/components/ui/input/input.svelte";
   import Label from "$lib/components/ui/label/label.svelte";
   import BackgroundPicker from "./background-picker.svelte";
-  import { mockUsers, currentUserId } from "$lib/data/users";
   import { defaultBackground } from "$lib/data/backgrounds";
-  import { createRoom } from "$lib/data/rooms.svelte";
-  import type { RoomBackground } from "$lib/types/room";
+  import { createRoom } from "$lib/api/room";
+  import { BackgroundType, type CreateRoomInput, type Room, type RoomBackground } from "$lib/types/room";
+  import type { User } from "$lib/types/user";
+
+  let { users, onCreateRoom }: { 
+    users?: User[],
+    onCreateRoom?: (room: Room) => void
+  } = $props();
 
   let open = $state(false);
-  let number = $state<number | null>(null);
+  let name = $state<string | null>(null);
   let description = $state("");
-  let selectedMemberIds = $state<string[]>([]);
+  let selectedMemberIds = $state<number[]>([]);
   let background = $state<RoomBackground>(defaultBackground);
 
-  const availableUsers = mockUsers.filter((u) => u.id !== currentUserId);
-  const canSubmit = $derived(number !== null && number > 0 && selectedMemberIds.length > 0);
+  const canSubmit = $derived(name !== null && name !== "" && selectedMemberIds.length > 0);
 
   function reset() {
-    number = null;
+    name = null;
     description = "";
     selectedMemberIds = [];
     background = defaultBackground;
   }
 
-  function toggleMember(id: string) {
+  function toggleMember(id: number) {
     selectedMemberIds = selectedMemberIds.includes(id)
       ? selectedMemberIds.filter((m) => m !== id)
       : [...selectedMemberIds, id];
   }
 
-  function handleSubmit(event: SubmitEvent) {
+  async function handleSubmit(event: SubmitEvent) {
     event.preventDefault();
-    if (!canSubmit || number === null) return;
-    createRoom({
-      number,
+    if (!canSubmit || name === null) return;
+    const result = await createRoom({
+      name,
       description: description.trim(),
-      memberIds: selectedMemberIds,
-      background,
+      backgroundType: background.kind,
+      background: background.value,
+      user_ids: selectedMemberIds,
     });
+    onCreateRoom?.(result.data);
     open = false;
     reset();
   }
@@ -64,20 +70,20 @@
     <Dialog.Header>
       <Dialog.Title>Create new room</Dialog.Title>
       <Dialog.Description>
-        Set a room number, a short description, and pick who can join.
+        Set a room name, a short description, and pick who can join.
       </Dialog.Description>
     </Dialog.Header>
 
     <form onsubmit={handleSubmit} class="space-y-4">
       <div class="space-y-1.5">
-        <Label for="room-number">Room number</Label>
+        <Label for="room-name">Room name</Label>
         <Input
-          id="room-number"
-          type="number"
+          id="room-name"
+          type="name"
           min="1"
           required
-          bind:value={number}
-          placeholder="e.g. 101"
+          bind:value={name}
+          placeholder="e.g. casual chat room"
         />
       </div>
 
@@ -94,7 +100,7 @@
         <Label>Members</Label>
         <div class="max-h-40 overflow-y-auto rounded-md border border-border">
           <ul class="divide-y divide-border">
-            {#each availableUsers as user (user.id)}
+            {#each users as user (user.id)}
               <li>
                 <label class="flex cursor-pointer items-center gap-3 px-3 py-2 hover:bg-muted/50">
                   <input

@@ -5,17 +5,16 @@
   import type { Room } from "$lib/types/room";
 
   let { data } = $props();
-  // svelte-ignore state_referenced_locally
-  let rooms = $state<Room[]>(data.rooms ?? []);
-  // svelte-ignore state_referenced_locally
-  let paging = $state(data.paging);
+  let rooms = $derived<Room[]>(data.rooms ?? []);
+  let paging = $derived(data.paging);
 
   type snippetParam = {
     title: string,
     desc: string,
     rooms: Room[],
     createRoom?: boolean,
-    onLoadMore?: () => Promise<void>
+    onLoadMore?: () => Promise<void>,
+    onCreateRoom?: (room: Room) => void
   }
 
   async function loadMore() {
@@ -25,9 +24,13 @@
     rooms = [...rooms, ...result.data];
     paging = result.paging;
   }
+
+  function handleCreateRoom(room: Room) {
+    rooms = [room, ...rooms];
+  }
 </script>
 
-{#snippet roomGroup({title, desc, rooms, createRoom, onLoadMore}: snippetParam)}
+{#snippet roomGroup({title, desc, rooms, createRoom, onLoadMore, onCreateRoom}: snippetParam)}
 <div class="flex flex-col gap-6">
   <div class="flex items-end justify-between">
     <div>
@@ -36,7 +39,7 @@
     </div>
   </div>
 
-  <RoomCarousel rooms={rooms} createRoom={createRoom} onLoadMore={onLoadMore}/>
+  <RoomCarousel users={data.users} rooms={rooms} createRoom={createRoom} onLoadMore={onLoadMore} onCreateRoom={onCreateRoom}/>
 </div>
 {/snippet}
 
@@ -47,7 +50,8 @@
     desc: "Pick a room to join or create a new one.",
     rooms: rooms,
     createRoom: true,
-    onLoadMore: loadMore
+    onLoadMore: loadMore,
+    onCreateRoom: handleCreateRoom
   })}
 
   {@render roomGroup({

@@ -4,13 +4,16 @@
   import RoomCard from "./room-card.svelte";
   import CreateRoomDialog from "./create-room-dialog.svelte";
   import type { Room } from "$lib/types/room";
+  import type { User } from "$lib/types/user";
 
   let scroller = $state<HTMLDivElement | null>(null);
 
-  let { rooms, createRoom = false, onLoadMore }: { 
+  let { rooms, users, createRoom = false, onLoadMore, onCreateRoom }: { 
     rooms: Room[], 
+    users: User[],
     createRoom?: boolean,
-    onLoadMore?: () => Promise<void>
+    onLoadMore?: () => Promise<void>,
+    onCreateRoom?: (room: Room) => void
   } = $props();
 
   function scrollBy(direction: 1 | -1) {
@@ -44,7 +47,7 @@
   >
     {#if createRoom}
       <div class="snap-start">
-        <CreateRoomDialog />
+        <CreateRoomDialog {users} {onCreateRoom} />
       </div>
     {/if}
     {#each rooms as room (room.id)}

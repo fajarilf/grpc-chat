@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Users } from "@lucide/svelte";
   import { ImageCard } from "$lib/components/ui/image-card";
-  import type { Room } from "$lib/types/room";
+  import { BackgroundType, type Room } from "$lib/types/room";
 
   let { room, href }: { room: Room; href?: string } = $props();
 </script>
@@ -11,7 +11,7 @@
   class="aspect-video w-72 shrink-0"
 >
   {#snippet bg()}
-    {#if room.backgroundType === "COLOR"}
+    {#if room.backgroundType === BackgroundType.COLOR}
       <div class="absolute inset-0" style="background-color: {room.background};"></div>
     {:else}
       <img
@@ -24,7 +24,7 @@
   {/snippet}
 
   <div class="flex items-end justify-between gap-2">
-    <h3 class="text-base font-semibold leading-tight">Room {room.name}</h3>
+    <h3 class="text-base font-semibold leading-tight">{room.name}</h3>
     <div class="flex items-center gap-1 text-xs opacity-90">
       <Users class="size-3.5" />
       <span>{room.users.length}</span>
