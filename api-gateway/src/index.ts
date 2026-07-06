@@ -7,12 +7,14 @@ import SwaggerParser from '@apidevtools/swagger-parser';
 import apiRouter from './api/index';
 import { attachWebSocket } from './websocket/index';
 import { apiReference } from '@scalar/express-api-reference';
+import { ErrorMiddleware } from './api/middlewares/error-middleware';
 
 async function bootstrap() {
   const app = express();
   app.use(cors());
   app.use(express.json());
   app.use('/api', apiRouter);
+  app.use(ErrorMiddleware);
 
   // Bundle the split OpenAPI YAML (main-docs.yaml + its external $refs) into a
   // single resolved document. Scalar does not reliably resolve external
