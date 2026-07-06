@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import * as roomClient from "../../grpc-client/room"
-import { ApiCursorResponse, ApiResponse } from "../../types/api-response"
+import { ApiResponse } from "../../types/api-response"
 import { RoomCreateRequest, RoomListRequest, RoomResponseWithUser } from "../../proto/room";
 
 export class RoomController {
 
     static async Get (
         req: Request, 
-        res: Response<ApiCursorResponse<RoomResponseWithUser[]>>, 
+        res: Response<ApiResponse<RoomResponseWithUser[]>>, 
         next: NextFunction
     ) {
         try {
@@ -21,9 +21,11 @@ export class RoomController {
             res.status(200).json({
                 status: "success",
                 data: response.rooms,
-                nextCursor: response.nextCursor,
-                prevCursor: response.prevCursor,
-                hasMore: response.hasMore
+                paging: {
+                    nextCursor: response.nextCursor,
+                    prevCursor: response.prevCursor,
+                    hasMore: response.hasMore
+                }
             });
         } catch (error) {
             next(error);

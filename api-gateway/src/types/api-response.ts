@@ -1,9 +1,10 @@
 export interface ApiResponse<TModel> {
     status: string,
     data: TModel
+    paging?: Paging
 }
 
-export interface ApiCursorResponse<TModel> extends ApiResponse<TModel> {
+export interface Paging {
     nextCursor: number
     prevCursor: number
     hasMore: boolean
