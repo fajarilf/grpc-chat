@@ -1,17 +1,22 @@
+import type { User } from "./user";
+
 export type RoomBackground =
   | { kind: "color"; value: string }
   | { kind: "image"; src: string };
 
-export type User = {
-  id: string;
-  name: string;
-};
-
 export type Room = {
   id: string;
-  number: number;
+  name: number;
   description: string;
-  memberIds: string[];
-  background: RoomBackground;
+  users: User[];
+  background: string;
+  backgroundType: "COLOR" | "IMAGE"
   createdAt: Date;
 };
+
+export type CreateRoomInput = {
+    number: number,
+    description: string,
+    memberIds: string[],
+    background: RoomBackground
+}
