@@ -7,13 +7,24 @@
 
   let scroller = $state<HTMLDivElement | null>(null);
 
+  let { rooms, createRoom = false, onLoadMore }: { 
+    rooms: Room[], 
+    createRoom?: boolean,
+    onLoadMore?: () => Promise<void>
+  } = $props();
+
   function scrollBy(direction: 1 | -1) {
     if (!scroller) return;
     const amount = scroller.clientWidth * 0.8;
     scroller.scrollBy({ left: direction * amount, behavior: "smooth" });
-  }
 
-  let { rooms, createRoom = false }: { rooms: Room[], createRoom?: boolean } = $props()
+    if (direction === 1) {
+      const { scrollLeft, scrollWidth, clientWidth } = scroller;
+      if (scrollLeft + clientWidth >= scrollWidth - clientWidth * 0.2) {
+        onLoadMore?.();
+      }
+    }
+  }
 
 </script>
 
